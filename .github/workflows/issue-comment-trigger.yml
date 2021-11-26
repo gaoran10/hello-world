@@ -5,12 +5,10 @@ on:
     types: [created]
 
 jobs:
-  run_chaos_test:
+  chaos-test:
     name: run chaos test
-    needs: [collect_test_parameter]
     runs-on: ubuntu-latest
     steps:
-
       - name: setup python
         uses: actions/setup-python@v2
         with:
