@@ -1,0 +1,48 @@
+name: Java CI - pulsar:chaos:test
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  run_chaos_test:
+    name: run chaos test
+    needs: [collect_test_parameter]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: actions/checkout@v2
+        with:
+          repository: streamnative/chaos-test
+          token: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ref: master
+          path: chaos-test
+
+      - uses: actions/checkout@v2
+        with:
+          repository: gaoran10/hello-world
+          token: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ref: master
+          path: hello
+
+      - name: generate auto-release workflows
+        id: entry
+        env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          commands=$(cat <<EOF
+          ${{github.event.comment.body}}
+          EOF
+          )
+          echo ${commands}
+          export CI_HOME=$(pwd)/ci
+          ./hello/scripts/gen-workflows.py ${commands}
+          ls ./chaos-test
+          ls ./hello
