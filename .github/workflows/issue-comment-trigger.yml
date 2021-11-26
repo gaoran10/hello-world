@@ -14,19 +14,19 @@ jobs:
         with:
           python-version: 3.9
 
-      - uses: actions/checkout@v2
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: checkout chaos-test repo
+        uses: actions/checkout@v2
         with:
           repository: streamnative/chaos-test
           token: ${{ secrets.RAN_GITHUB_TOKEN }}
           ref: master
           path: chaos-test
-
-      - uses: actions/checkout@v2
-        with:
-          repository: gaoran10/hello-world
-          token: ${{ secrets.RAN_GITHUB_TOKEN }}
-          ref: master
-          path: hello
 
       - name: generate auto-release workflows
         id: entry
