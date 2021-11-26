@@ -35,12 +35,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          ls ./chaos-test
-          ls ./hello
+          ls -al ./hello/scripts
+
           commands=$(cat <<EOF
           ${{github.event.comment.body}}
           EOF
           )
           echo ${commands}
           export CI_HOME=$(pwd)/ci
-          ./hello/scripts/chaos-test-workflow.py
+          python ./hello/scripts/chaos-test-workflow.py
