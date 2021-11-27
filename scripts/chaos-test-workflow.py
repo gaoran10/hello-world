@@ -34,6 +34,15 @@ class ChaosTestManager:
 
             self.configuration[var] = val
 
+    def github_api_create_comment(number, body):
+        body = body.replace('\n', '\\n')
+        url = 'https://api.github.com/repos/streamnative/streamnative-ci/issues/{}/comments'.format(number)
+        prefix = 'curl -H "Accept: application/vnd.github.v3.text+json" -u {}:{} '.format(os.getenv('GITHUB_USERNAME'), os.getenv('GITHUB_TOKEN'))
+        param = ' -d \'{"body": "' + body + '"}\''
+
+        proc = subprocess.run(prefix + url + param, shell=True, capture_output=True)
+        return json.loads(proc.stdout.decode('utf-8'))
+
     def link_action_with_issue(self):
         print('link_action_with_issue action: ', os.getenv('ACTION'))
 
