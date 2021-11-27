@@ -29,11 +29,11 @@ jobs:
           path: chaos-test
 
       - name: generate auto-release workflows
-        id: entry
         env:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ACTION: ${{ github.action }}
         run: |
           ls -al ./hello/scripts
 
@@ -44,3 +44,20 @@ jobs:
           echo ${commands}
           export CI_HOME=$(pwd)/ci
           python ./hello/scripts/chaos-test-workflow.py
+#          cd chaos-test
+#          mvn -Dtest=SimpleMessagingTest clean test
+
+#      - name: package reports
+#        if: failure()
+#        run: |
+#          rm -rf artifacts
+#          mkdir artifacts
+#          find . -type d -name "reports" -exec cp --parents -R {} artifacts/ \;
+#          zip -r artifacts.zip artifacts
+#
+#      - uses: actions/upload-artifact@master
+#        name: upload reports
+#        if: failure()
+#        with:
+#          name: artifacts
+#          path: artifacts.zip
