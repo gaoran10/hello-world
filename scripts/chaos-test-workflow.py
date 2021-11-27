@@ -44,7 +44,10 @@ class ChaosTestManager:
         return json.loads(proc.stdout.decode('utf-8'))
 
     def link_action_with_issue(self):
-        print('link_action_with_issue action: ', os.getenv('ACTION'))
+        body = 'comment link action \n'
+        body = 'https://github.com/gaoran10/hello-world/actions/runs/' + os.getenv('RUN_ID')
+        print('link_action_with_issue action: ', body)
+        self.github_api_create_comment(os.getenv('ISSUE_NUMBER'), body)
 
 def main():
     chaos_test_manager = ChaosTestManager()
