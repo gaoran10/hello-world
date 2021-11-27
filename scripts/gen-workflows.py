@@ -42,6 +42,6 @@ def main():
     comments = chaos_test_manager.github_api_query_comments()
     chaos_test_manager.get_chaos_test_configurations(comments)
     print('configurations: ', chaos_test_manager.configuration)
-    link_action_with_issue()
+    chaos_test_manager.link_action_with_issue()
 
 main()
