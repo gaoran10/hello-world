@@ -28,7 +28,7 @@ jobs:
           ref: master
           path: chaos-test
 
-      - name: generate auto-release workflows
+      - name: run chaos test
         env:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}

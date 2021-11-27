@@ -34,11 +34,14 @@ class ChaosTestManager:
 
             self.configuration[var] = val
 
+    def link_action_with_issue(self):
+        print('link_action_with_issue action: ', os.getenv('ACTION'))
 
 def main():
     chaos_test_manager = ChaosTestManager()
     comments = chaos_test_manager.github_api_query_comments()
     chaos_test_manager.get_chaos_test_configurations(comments)
     print('configurations: ', chaos_test_manager.configuration)
+    chaos_test_manager.link_action_with_issue()
 
 main()
