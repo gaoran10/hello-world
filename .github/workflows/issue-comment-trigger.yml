@@ -33,36 +33,42 @@ jobs:
           ref: master
           path: chaos-test
 
-      - name: run chaos test
+      - name: chaos test create
         env:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           RUN_ID: ${{ github.run_id }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          TEST_ACTION: start
         run: |
-          ls -al ./hello/scripts
-
-          commands=$(cat <<EOF
-          ${{github.event.comment.body}}
-          EOF
-          )
-          echo ${commands}
-          export CI_HOME=$(pwd)/ci
           python ./hello/scripts/chaos-test-workflow.py
 #          cd chaos-test
 #          mvn -Dtest=SimpleMessagingTest clean test
 
-#      - name: package reports
-#        if: failure()
-#        run: |
-#          rm -rf artifacts
-#          mkdir artifacts
-#          find . -type d -name "reports" -exec cp --parents -R {} artifacts/ \;
-#          zip -r artifacts.zip artifacts
-#
-#      - uses: actions/upload-artifact@master
-#        name: upload reports
-#        if: failure()
-#        with:
-#          name: artifacts
-#          path: artifacts.zip
+      - name: chaos test finish
+        env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          STATUS: ${{ job.status }}
+          TEST_ACTION: finish
+        run: |
+          python ./hello/scripts/chaos-test-workflow.py
+
+      - name: package reports
+        if: failure()
+        run: |
+          python ./hello/scripts/chaos-test-workflow.py
+          rm -rf artifacts
+          mkdir artifacts
+          find . -type d -name "reports" -exec cp --parents -R {} artifacts/ \;
+          zip -r artifacts.zip artifacts
+
+      - uses: actions/upload-artifact@master
+        name: upload reports
+        if: failure()
+        with:
+          name: artifacts
+          path: artifacts.zip
