@@ -68,10 +68,12 @@ class ChaosTestManager:
         body += '\n'
         body += '-------------- \n'
         body += 'action: {} \n'.format(action)
+
         if test_action == 'finish':
             body += 'status: {} \n'.format(os.getenv('STATUS')
-        if test_action == 'create':
+        elif test_action == 'create':
             body += 'https://github.com/gaoran10/hello-world/actions/runs/' + os.getenv('RUN_ID')
+
         print('link_action_with_issue body: ', body)
         self.github_api_update_comment(comment_id, body)
 
