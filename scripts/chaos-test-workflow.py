@@ -3,7 +3,8 @@
 import os
 import json
 import subprocess
-
+import requests
+from requests.auth import HTTPBasicAuth
 
 class ChaosTestManager:
 
@@ -27,13 +28,16 @@ class ChaosTestManager:
 
         json_str = ''
         for line in configuration_body.splitlines():
-            if line.startswith("```json"):
+            if line.startswith('== Chaos Test Configurations =='):
+                continue
+            elif line.startswith("```json"):
                 continue
             elif line.startswith("```"):
                 break
-            json_str += line
+            else:
+                json_str += line
         print('get chaos test json_str: ', json_str)
-        config = json.dumps(json_str, indent=4, separators=(',', ': '))
+        config = json.loads(json_str)
         print('get chaos test config: ', config)
         return config
 
@@ -47,30 +51,29 @@ class ChaosTestManager:
         return json.loads(proc.stdout.decode('utf-8'))
 
     def github_api_update_comment(self, comment_id, body):
-        body = body.replace('\n', '\\n')
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/comments/{}'.format(comment_id)
-        prefix = 'curl -X PATCH -H "Accept: application/vnd.github.v3.text+json" -u {}:{} '.format(os.getenv('GITHUB_USERNAME'), os.getenv('GITHUB_TOKEN'))
-        param = ' -d \'{"body": "' + body + '"}\''
 
-        proc = subprocess.run(prefix + url + param, shell=True, capture_output=True)
-        return json.loads(proc.stdout.decode('utf-8'))
+        headers = {'Accept': 'application/vnd.github.v3+json'}
+        auth = HTTPBasicAuth(os.getenv('GITHUB_USERNAME'), os.getenv('GITHUB_TOKEN'))
+        result = requests.patch(url, headers=headers, auth=auth, json={"body": body})
+        print('update result: ', result)
 
     def github_api_get_comment(self, comment_id):
-        body = body.replace('\n', '\\n')
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/comments/{}'.format(comment_id)
-        prefix = 'curl -H "Accept: application/vnd.github.v3.text+json" -u {}:{} '.format(os.getenv('GITHUB_USERNAME'), os.getenv('GITHUB_TOKEN'))
 
-        proc = subprocess.run(prefix + url + param, shell=True, capture_output=True)
-        return json.loads(proc.stdout.decode('utf-8'))
+        headers = {'Accept': 'application/vnd.github.v3+json'}
+        auth = HTTPBasicAuth(os.getenv('GITHUB_USERNAME'), os.getenv('GITHUB_TOKEN'))
+        result = requests.get(url, headers=headers, auth=auth)
+        return result.json()
 
     def link_action_with_issue(self, comment_id, test_action, old_comment_body):
         body = old_comment_body
-        body += '\n'
-        body += '-------------- \n'
-        body += 'action: {} \n'.format(action)
+        body += '\r\n \r\n'
+        body += '-------------- \r\n'
+        body += 'action: {} \r\n'.format(test_action)
 
         if test_action == 'finish':
-            body += 'status: {} \n'.format(os.getenv('STATUS')
+            body += 'status: {} \r\n'.format(os.getenv('STATUS'))
         elif test_action == 'create':
             body += 'https://github.com/gaoran10/hello-world/actions/runs/' + os.getenv('RUN_ID')
 
@@ -82,6 +85,7 @@ def main():
     test_action = os.getenv('TEST_ACTION')
     comment_body = os.getenv('COMMENT_BODY')
     comment_id = os.getenv('COMMENT_ID')
+
     if test_action == 'create':
         print('chaos test create ...')
         chaos_test_manager.get_chaos_test_configurations(comment_body)
@@ -89,5 +93,5 @@ def main():
     elif test_action == 'finish':
         print('chaos test finish ...')
         comment = chaos_test_manager.github_api_get_comment(comment_id)
-        chaos_test_manager.link_action_with_issue(comment_id, test_action, comment.body)
+        chaos_test_manager.link_action_with_issue(comment_id, test_action, comment['body'])
 main()
