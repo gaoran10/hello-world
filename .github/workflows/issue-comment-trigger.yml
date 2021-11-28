@@ -38,7 +38,7 @@ jobs:
         with:
           repository: streamnative/chaos-test
           token: ${{ secrets.RAN_GITHUB_TOKEN }}
-          ref: master
+          ref: gaoran/adjust-chaos-test-workflow
           path: chaos-test
 
       - name: chaos test create
@@ -52,8 +52,8 @@ jobs:
           TEST_ACTION: create
         run: |
           python ./hello/scripts/chaos-test-workflow.py
-#          cd chaos-test
-#          mvn -Dtest=SimpleMessagingTest clean test
+          cd chaos-test
+          mvn -Dtest=SimpleMessagingTest clean test
 
       - name: chaos test finish
         env:
