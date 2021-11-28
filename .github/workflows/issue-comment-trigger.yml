@@ -49,7 +49,7 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           COMMENT_ID: ${{ github.event.comment.id }}
           COMMENT_BODY: ${{ github.event.comment.body }}
-          TEST_ACTION: start
+          TEST_ACTION: create
         run: |
           python ./hello/scripts/chaos-test-workflow.py
 #          cd chaos-test
