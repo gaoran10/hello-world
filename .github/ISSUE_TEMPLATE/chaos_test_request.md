@@ -8,7 +8,9 @@ assignees: ''
 
 This issue is used to create and track a chaos test.
 
-== Chaos Test Arguments Header ==
-```
-EXTERNAL_HOST:xxxxxx
+== Chaos Test Configurations ==
+```json
+{
+  "EXTERNAL_HOST": "xxx.xxx"
+}
 ```

@@ -18,19 +18,18 @@ class ChaosTestManager:
 
     def get_chaos_test_configurations(self, comment_body):
         configuration_body = None
-        if comment_body.startswith('== Chaos Test Configuration =='):
+        if comment_body.startswith('== Chaos Test Configurations =='):
             configuration_body = comment_body
 
         if not configuration_body:
             print('The arguments not generated yet')
             return
 
-        boolean read_finish = False
         json_str = ''
         for line in configuration_body.splitlines():
-            if line.startswith('```json'):
+            if line.startswith("```json"):
                 continue
-            if line.startswith('```'):
+            if line.startswith("```"):
                 break
             json_str += line
         print('get chaos test json_str: ', json_str)
