@@ -29,7 +29,7 @@ class ChaosTestManager:
         for line in configuration_body.splitlines():
             if line.startswith("```json"):
                 continue
-            if line.startswith("```"):
+            elif line.startswith("```"):
                 break
             json_str += line
         print('get chaos test json_str: ', json_str)
@@ -86,7 +86,7 @@ def main():
         print('chaos test create ...')
         chaos_test_manager.get_chaos_test_configurations(comment_body)
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
-    elif test_action = 'finish':
+    elif test_action == 'finish':
         print('chaos test finish ...')
         comment = chaos_test_manager.github_api_get_comment(comment_id)
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment.body)
