@@ -32,8 +32,13 @@ jobs:
         run: |-
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
 
-#          Now you can run gcloud commands authenticated as the impersonated service account.
-          gcloud secrets versions access "latest" --secret "my-secret"
+          gcloud auth list
+          gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
+
+      - name: deploy to cluster
+        uses: wahyd4/kubectl-helm-action@master
+        with:
+          args: kubectl get pods -n candidate-4
 
       - name: Dump GitHub context
         env:
