@@ -20,7 +20,6 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0.4.0'
         with:
-          token_format: 'access_token'
           workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
           service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
@@ -32,7 +31,7 @@ jobs:
         run: |-
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
 
-          gcloud auth list
+#          gcloud auth list
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
 
       - name: deploy to cluster
