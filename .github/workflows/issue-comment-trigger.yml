@@ -7,8 +7,27 @@ on:
 jobs:
   chaos-test:
     name: run chaos test
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: ubuntu-latest
     steps:
+      - id: 'auth'
+          name: 'Authenticate to Google Cloud'
+          uses: 'google-github-actions/auth@v0.4.0'
+          with:
+            token_format: 'access_token'
+            workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/*'
+            service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
+
+      # Example of using the output. The token is usually provided as a Bearer
+      # token.
+      - id: 'access-secret'
+        run: |-
+          echo ${{ steps.auth.outputs.access_token }}
+          curl https://secretmanager.googleapis.com/v1/projects/my-project/secrets/my-secret/versions/1:access \
+            --header "Authorization: Bearer ${{ steps.auth.outputs.access_token }}"
+
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
