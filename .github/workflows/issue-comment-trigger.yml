@@ -32,7 +32,7 @@ jobs:
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
           gcloud auth list
           gcloud config set account 'rgao-streamnative-io@affable-ray-226821.iam.gserviceaccount.com'
-          bin/gcloud container get-server-config
+          gcloud container get-server-config
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
 
