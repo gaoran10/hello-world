@@ -12,6 +12,10 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     steps:
+      - uses: 'google-github-actions/setup-gcloud@master'
+          with:
+            project_id: 'my-project'
+
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0.4.0'
@@ -20,13 +24,16 @@ jobs:
           workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
           service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
-      # Example of using the output. The token is usually provided as a Bearer
-      # token.
-      - id: 'access-secret'
+      # Authenticate using the created credentials file.
+      #
+      # WARNING: The --cred-file flag is in preview and is subject to change.
+      - id: 'gcloud'
+        name: 'gcloud'
         run: |-
-          echo ${{ steps.auth.outputs.access_token }}
-          curl https://secretmanager.googleapis.com/v1/projects/my-project/secrets/my-secret/versions/1:access \
-            --header "Authorization: Bearer ${{ steps.auth.outputs.access_token }}"
+          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+
+#          Now you can run gcloud commands authenticated as the impersonated service account.
+          gcloud secrets versions access "latest" --secret "my-secret"
 
       - name: Dump GitHub context
         env:
