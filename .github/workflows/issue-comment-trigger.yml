@@ -23,8 +23,7 @@ jobs:
           workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
           service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
-      - id: 'install kubectl and helm'
-        name: 'install kubectl'
+      - name: 'install kubectl'
         run: |
           echo 'install kubectl'
           curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
@@ -37,8 +36,7 @@ jobs:
       # Authenticate using the created credentials file.
       #
       # WARNING: The --cred-file flag is in preview and is subject to change.
-      - id: 'gcloud'
-        name: 'gcloud'
+      - name: 'gcloud'
         run: |
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
           gcloud auth list
