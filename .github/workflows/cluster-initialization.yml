@@ -98,5 +98,6 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           STATUS: ${{ job.status }}
           TEST_ACTION: finish
+        if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
           python ./hello/scripts/chaos-cluster-manager.py
