@@ -75,6 +75,8 @@ jobs:
 
       - name: deploy cluster
         env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           COMMENT_BODY: ${{ github.event.issue.body }}
           TEST_ACTION: create
@@ -90,7 +92,9 @@ jobs:
 
       - name: deploy cluster finish
         env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          TEST_ACTION: create
+          TEST_ACTION: finish
         run: |
           python ./hello/scripts/chaos-cluster-manager.py
