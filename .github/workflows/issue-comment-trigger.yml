@@ -21,7 +21,7 @@ jobs:
         uses: 'google-github-actions/auth@v0.4.0'
         with:
           workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
-          service_account: 'rgao-streamnative-io@affable-ray-226821.iam.gserviceaccount.com'
+          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
       # Authenticate using the created credentials file.
       #
@@ -31,7 +31,6 @@ jobs:
         run: |
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
           gcloud auth list
-          gcloud config set account 'rgao-streamnative-io@affable-ray-226821.iam.gserviceaccount.com'
           gcloud container get-server-config
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
