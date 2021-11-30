@@ -56,9 +56,9 @@ class ChaosClusterManager:
         body += '-------------- \r\n'
         body += 'action: {} \r\n'.format(test_action)
 
-        if test_action == 'create':
+        if test_action == 'finish':
             body += 'status: {} \r\n'.format(os.getenv('STATUS'))
-        elif test_action == 'finish':
+        elif test_action == 'create':
             body += 'https://github.com/gaoran10/hello-world/actions/runs/' + os.getenv('RUN_ID')
 
         print('link_action_with_issue body: ', body)

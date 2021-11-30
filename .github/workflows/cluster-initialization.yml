@@ -84,6 +84,7 @@ jobs:
         run: |
           python ./hello/scripts/chaos-cluster-manager.py
           echo 'image version'
+          env
           echo $CHAOS_CLUSTER_IMAGE_VERSION
           cd charts
           ./scripts/pulsar/change_pulsar_image.sh $CHAOS_CLUSTER_IMAGE_VERSION
