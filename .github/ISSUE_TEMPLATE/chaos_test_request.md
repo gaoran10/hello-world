@@ -6,18 +6,7 @@ labels: type/chaos-test
 assignees: ''
 ---
 
-This issue is used to create and track a chaos test.
-
-== Chaos Test Configurations ==
-```json
-{
-  "EXTERNAL_HOST": "xxx.xxx",
-  "tests": [
-    {
-      "testName": "SimpleMessageTest",
-      "produceCnt": 10000,
-      "produceRate": 100
-    }
-  ]
-}
+== Chaos Cluster Configurations ==
+```
+IMAGE_VERSION: 2.10.0-rc-202111212205
 ```
