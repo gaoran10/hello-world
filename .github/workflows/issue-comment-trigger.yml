@@ -23,6 +23,14 @@ jobs:
           workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
           service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
+      - id: 'install kubectl'
+        name: 'install kubectl'
+        run: |
+          echo 'install kubectl'
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+
       # Authenticate using the created credentials file.
       #
       # WARNING: The --cred-file flag is in preview and is subject to change.
@@ -35,11 +43,7 @@ jobs:
           gcloud container get-server-config
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
-
-      - name: get cluster pods
-        uses: wahyd4/kubectl-helm-action@master
-        with:
-          args: kubectl get pods -n candidate-4
+          kubectl get pods -n candidate-4
 
       - name: Dump GitHub context
         env:
