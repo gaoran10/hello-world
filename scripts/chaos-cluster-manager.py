@@ -32,7 +32,7 @@ class ChaosClusterManager:
 
             var, val = line.split(':')[0], ':'.join(line.split(':')[1:])
             os.environ['CHAOS_CLUSTER_' + var.strip()] = val.strip()
-            print('add chaos cluster configuration in env. ', var.strip(), '=', var.strip())
+            print('add chaos cluster configuration in env. ', var.strip(), '=', val.strip())
 
     def github_api_update_issue(self, issue_number, body):
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/{}'.format(issue_number)
@@ -56,9 +56,9 @@ class ChaosClusterManager:
         body += '-------------- \r\n'
         body += 'action: {} \r\n'.format(test_action)
 
-        if test_action == 'chaos cluster initialization finish':
+        if test_action == 'create':
             body += 'status: {} \r\n'.format(os.getenv('STATUS'))
-        elif test_action == 'chaos cluster initialization start':
+        elif test_action == 'finish':
             body += 'https://github.com/gaoran10/hello-world/actions/runs/' + os.getenv('RUN_ID')
 
         print('link_action_with_issue body: ', body)
