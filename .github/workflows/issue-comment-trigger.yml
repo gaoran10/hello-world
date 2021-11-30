@@ -1,7 +1,7 @@
 name: Java CI - pulsar:chaos:test
 
 on:
-  issue:
+  issues:
     types: [created]
 
 jobs:
@@ -16,14 +16,7 @@ jobs:
         with:
           project_id: 'affable-ray-226821'
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0.4.0'
-        with:
-          workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
-          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
-
-      - name: 'install kubectl'
+      - name: 'install kubectl and helm'
         run: |
           echo 'install kubectl'
           curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
@@ -31,20 +24,27 @@ jobs:
           sudo mv ./kubectl /usr/local/bin/kubectl
           echo 'install helm'
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-          helm search hub wordpress
+
+      - uses: 'google-github-actions/setup-gcloud@master'
+        with:
+          project_id: 'affable-ray-226821'
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
+          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
       # Authenticate using the created credentials file.
       #
       # WARNING: The --cred-file flag is in preview and is subject to change.
-      - name: 'gcloud'
+      - name: 'gcloud login'
         run: |
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
-          gcloud auth list
           gcloud config set compute/zone us-east4-b
-          gcloud container get-server-config
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
-          kubectl get pods -n candidate-4
 
       - name: Dump GitHub context
         env:
@@ -90,6 +90,7 @@ jobs:
         run: |
           python ./hello/scripts/chaos-test-workflow.py
           cd chaos-test
+          kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650
           mvn -Dtest=SimpleMessagingTest clean test
 
       - name: chaos test finish
