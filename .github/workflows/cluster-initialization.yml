@@ -82,8 +82,8 @@ jobs:
           COMMENT_BODY: ${{ github.event.issue.body }}
           TEST_ACTION: create
         run: |
-          python ./hello/scripts/chaos-cluster-manager.py
           cd charts
+          python ../hello/scripts/chaos-cluster-manager.py
 #          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
 #          helm repo add loki https://grafana.github.io/loki/charts
 #          helm dependency update charts/pulsar-custom
