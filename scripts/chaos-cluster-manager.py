@@ -31,6 +31,7 @@ class ChaosClusterManager:
                 continue
 
             var, val = line.split(':')[0], ':'.join(line.split(':')[1:])
+            print('add chaos cluster configuration in env. ', var.strip(), '=', var.strip()
             os.environ['CHAOS_CLUSTER_' + var.strip()] = val.strip()
 
     def github_api_update_issue(self, issue_number, body):

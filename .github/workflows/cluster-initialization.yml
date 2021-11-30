@@ -78,14 +78,15 @@ jobs:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN_ID: ${{ github.run_id }}
           COMMENT_BODY: ${{ github.event.issue.body }}
           TEST_ACTION: create
         run: |
           python ./hello/scripts/chaos-cluster-manager.py
           echo "image version $CHAOS_CLUSTER_IMAGE_VERSION"
           cd charts
-          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
           ./scripts/pulsar/change_pulsar_image.sh "$CHAOS_CLUSTER_IMAGE_VERSION"
+#          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
 #          helm repo add loki https://grafana.github.io/loki/charts
 #          helm dependency update charts/pulsar-custom
 #          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 20m
@@ -95,6 +96,7 @@ jobs:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          STATUS: ${{ job.status }}
           TEST_ACTION: finish
         run: |
           python ./hello/scripts/chaos-cluster-manager.py
