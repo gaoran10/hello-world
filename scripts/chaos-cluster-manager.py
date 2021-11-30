@@ -74,7 +74,8 @@ def main():
         print('chaos cluster initialization start ...')
         chaos_cluster_manager.load_configurations(comment_body)
         chaos_cluster_manager.link_action_with_issue(issue_number, test_action, comment_body)
-        res = os.system('./charts/scripts/pulsar/change_pulsar_image.sh ' + os.getenv('CHAOS_CLUSTER_IMAGE_VERSION'))
+        os.system('cd charts')
+        res = os.system('./scripts/pulsar/change_pulsar_image.sh ' + os.getenv('CHAOS_CLUSTER_IMAGE_VERSION'))
         print('change chart Pulsar image res ', res)
     elif test_action == 'finish':
         print('chaos cluster initialization finish ...')
