@@ -86,9 +86,9 @@ jobs:
           cd charts
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
           ./scripts/pulsar/change_pulsar_image.sh "$CHAOS_CLUSTER_IMAGE_VERSION"
-          helm repo add loki https://grafana.github.io/loki/charts
-          helm dependency update charts/pulsar-custom
-          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 20m
+#          helm repo add loki https://grafana.github.io/loki/charts
+#          helm dependency update charts/pulsar-custom
+#          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 20m
 
       - name: deploy cluster finish
         env:
