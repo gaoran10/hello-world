@@ -54,13 +54,43 @@ jobs:
           ref: gaoran/use-nio-netty-server-cnx-factory
           path: charts
 
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
       - name: deploy cluster
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_BODY: ${{ github.event.issue.body }}
+          TEST_ACTION: create
         run: |
+          python ./hello/scripts/chaos-cluster-manager.py.py
+          echo 'image version $CHAOS_CLUSTER_IMAGE_VERSION'
           cd charts
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
-          ./scripts/pulsar/change_pulsar_image.sh 2.10.0-rc-202111212205
+          ./scripts/pulsar/change_pulsar_image.sh '$CHAOS_CLUSTER_IMAGE_VERSION'
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
           helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 20m
+
+      - name: deploy cluster finish
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          TEST_ACTION: create
+        run: |
+          python ./hello/scripts/chaos-cluster-manager.py.py
