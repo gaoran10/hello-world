@@ -1,0 +1,65 @@
+name: Java CI - pulsar:chaos:test
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  pulsar-cluster:
+    name: run chaos test
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: 'install kubectl and helm'
+        run: |
+          echo 'install kubectl'
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          echo 'install helm'
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - uses: 'google-github-actions/setup-gcloud@master'
+        with:
+          project_id: 'affable-ray-226821'
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
+          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
+
+      # Authenticate using the created credentials file.
+      #
+      # WARNING: The --cred-file flag is in preview and is subject to change.
+      - name: 'gcloud login'
+        run: |
+          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+          gcloud config set compute/zone us-east4-b
+          echo "------------------- get-credentials -------------------"
+          gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
+
+      - name: checkout chars repo
+        uses: actions/checkout@v2
+        with:
+          repository: gaoran10/charts
+          ref: gaoran/use-nio-netty-server-cnx-factory
+          path: charts
+
+      - name: deploy cluster
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-$ISSUE_NUMBER' -k 'pulsar-$ISSUE_NUMBER' -c
+          ./scripts/pulsar/change_pulsar_image.sh 2.10.0-rc-202111212205
+          helm repo add loki https://grafana.github.io/loki/charts
+          helm dependency update charts/pulsar-custom
+          helm install --set initialize=true --set namespace="chaos-$ISSUE_NUMBER" --values ./charts/pulsar-custom/values.yaml 'pulsar-$ISSUE_NUMBER'  ./charts/pulsar-custom/ --debug --wait --timeout 20m

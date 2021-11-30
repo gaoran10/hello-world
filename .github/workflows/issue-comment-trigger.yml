@@ -1,7 +1,7 @@
 name: Java CI - pulsar:chaos:test
 
 on:
-  issue_comment:
+  issue:
     types: [created]
 
 jobs:
