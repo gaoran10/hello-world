@@ -26,7 +26,7 @@ class ChaosClusterManager:
             print('The arguments not generated yet')
             return
 
-        for line in lasthead.splitlines():
+        for line in configuration_body.splitlines():
             if not line.count(':'):
                 continue
 
