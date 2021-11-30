@@ -87,7 +87,6 @@ jobs:
           env
           echo $CHAOS_CLUSTER_IMAGE_VERSION
           cd charts
-          ./scripts/pulsar/change_pulsar_image.sh $CHAOS_CLUSTER_IMAGE_VERSION
 #          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
 #          helm repo add loki https://grafana.github.io/loki/charts
 #          helm dependency update charts/pulsar-custom

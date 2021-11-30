@@ -32,7 +32,7 @@ class ChaosClusterManager:
 
             var, val = line.split(':')[0], ':'.join(line.split(':')[1:])
             os.environ['CHAOS_CLUSTER_' + var.strip()] = val.strip()
-            print('add chaos cluster configuration in env. ', var.strip(), '=', val.strip())
+            print('add chaos cluster configuration in env. ', 'CHAOS_CLUSTER_' + var.strip(), '=', os.getenv('CHAOS_CLUSTER_' + var.strip())
 
     def github_api_update_issue(self, issue_number, body):
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/{}'.format(issue_number)
@@ -74,6 +74,8 @@ def main():
         print('chaos cluster initialization start ...')
         chaos_cluster_manager.load_configurations(comment_body)
         chaos_cluster_manager.link_action_with_issue(issue_number, test_action, comment_body)
+        res = os.system('./charts/scripts/pulsar/change_pulsar_image.sh $CHAOS_CLUSTER_IMAGE_VERSION')
+        print('change chart Pulsar image res ', res)
     elif test_action == 'finish':
         print('chaos cluster initialization finish ...')
         comment = chaos_cluster_manager.github_api_get_issue(issue_number)
