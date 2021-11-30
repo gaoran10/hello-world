@@ -5,8 +5,8 @@ on:
     types: [created]
 
 jobs:
-  pulsar-cluster:
-    name: run chaos test
+  chaos-pulsar-cluster:
+    name: prepare chaos Pulsar cluster
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -59,8 +59,8 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           cd charts
-          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'pulsar-${{ github.event.issue.number }}' -c
+          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
           ./scripts/pulsar/change_pulsar_image.sh 2.10.0-rc-202111212205
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
-          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 20m
+          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 20m
