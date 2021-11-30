@@ -58,6 +58,7 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
+          cd charts
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-$ISSUE_NUMBER' -k 'pulsar-$ISSUE_NUMBER' -c
           ./scripts/pulsar/change_pulsar_image.sh 2.10.0-rc-202111212205
           helm repo add loki https://grafana.github.io/loki/charts
