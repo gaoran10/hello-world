@@ -23,13 +23,16 @@ jobs:
           workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
           service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
 
-      - id: 'install kubectl'
+      - id: 'install kubectl and helm'
         name: 'install kubectl'
         run: |
           echo 'install kubectl'
           curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
           chmod +x ./kubectl
           sudo mv ./kubectl /usr/local/bin/kubectl
+          echo 'install helm'
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm search hub wordpress
 
       # Authenticate using the created credentials file.
       #
