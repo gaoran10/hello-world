@@ -31,6 +31,7 @@ jobs:
         run: |
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
           gcloud auth list
+          gcloud config set compute/zone us-east4-b
           gcloud container get-server-config
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
