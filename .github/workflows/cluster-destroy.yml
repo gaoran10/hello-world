@@ -64,4 +64,4 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           helm uninstall 'chaos-pulsar-${{ github.event.issue.number }}'
-
+          kubectl delete ns 'chaos-${{ github.event.issue.number }}'
