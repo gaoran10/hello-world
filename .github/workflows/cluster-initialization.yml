@@ -84,6 +84,7 @@ jobs:
         run: |
           cd ./hello/chaos-mesh-template
           python chaos-mesh.py
+          kubectl port-forward -n chaos-testing svc/chaos-dashboard 2333:2333
 
       - name: deploy cluster finish
         env:
