@@ -69,7 +69,8 @@ class ChaosMeshEditor:
         return random_str
 
 def deploy_exps(exp_types, base_path="../chaos-mesh-template"):
-    if exp_types:
+    print('deploy exps: ', exp_types)
+    if not exp_types:
         raise RuntimeError("No chaos-mesh experiments.")
     for type in exp_types:
         if type == 'POD_KILL':
