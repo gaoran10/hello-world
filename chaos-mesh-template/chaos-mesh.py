@@ -37,6 +37,7 @@ class ChaosMeshEditor:
 
     def deploy(self):
         self.write()
+        os.system('cat ' + self._output_file_path)
         os.system('kubectl apply -f ' + self._output_file_path)
 
     def add_label_selector(self, component):
