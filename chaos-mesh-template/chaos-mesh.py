@@ -44,11 +44,11 @@ class ChaosMeshEditor:
         if self._is_scheduled:
             exp_type = self._exp['spec']['type']
             exp_type = self.format_exp_type(exp_type)
+            self._exp['spec'][exp_type]['selector']['namespaces'] = [self._ns]
             self._exp['spec'][exp_type]['selector']['labelSelectors']['component'] = component
-            self._exp['spec'][exp_type]['selector']['labelSelectors']['namespaces'] = [self._ns]
         else:
+            self._exp['spec']['selector']['namespaces'] = [self._ns]
             self._exp['spec']['selector']['labelSelectors']['component'] = component
-            self._exp['spec']['selector']['labelSelectors']['namespaces'] = [self._ns]
 
     def set_schedule(self, corn):
         if not self._is_scheduled:
