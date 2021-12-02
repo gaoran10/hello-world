@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
-label = "${LABEL}"
+body="${COMMENT_BODY}"
 
-if [ -z $label ]:
-  echo 'Miss chaos-test label'
+res=$(echo $body | grep "== Chaos Cluster Configurations ==")
+echo "check res $res"
+
+if [ -z $res ]
+then
+  echo "Miss chaos cluster configuration header"
   exit 0
+else
+  echo "Have chaos cluster configuration header"
+fi

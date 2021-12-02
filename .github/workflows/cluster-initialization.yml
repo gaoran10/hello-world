@@ -2,7 +2,7 @@ name: Chaos Cluster Initialization
 
 on:
   issues:
-    types: [created]
+    types: [opened]
 
 jobs:
   chaos-pulsar-cluster:
@@ -24,6 +24,8 @@ jobs:
           path: hello
 
       - name: check chaos-test label
+        env:
+          COMMENT_BODY: ${{ github.event.issue.body }}
         run: |
           sh ./hello/scripts/check-chaos-test-label.sh
 
