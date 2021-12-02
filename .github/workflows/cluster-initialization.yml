@@ -88,6 +88,7 @@ jobs:
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
           helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
+          python ../hello/chaos-mesh-template/chaos-mesh.py
 
       - name: deploy cluster finish
         env:
