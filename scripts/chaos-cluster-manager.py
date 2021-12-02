@@ -24,12 +24,16 @@ class ChaosClusterManager:
         is_config_area = False
         for line in comment_body.splitlines():
             if line.startswith('== Chaos Cluster Configurations =='):
+                print('set config area')
                 is_config_area = True
 
-            if not is_config_area or not line.count(':') or not line.startswith('#'):
-                continue
-            elif line.startswith('== Chaos Cluster Configurations End =='):
+            if line.startswith('== Chaos Cluster Configurations End =='):
+                print('reach configuration end')
                 break
+
+            if not is_config_area or line.count(':') == 0 or line.startswith('#'):
+                print('continue line: ', line, is_config_area, line.count(':'), line.startswith('#'))
+                continue
 
             var, val = line.split(':')[0], ':'.join(line.split(':')[1:])
             os.environ['CHAOS_CLUSTER_' + var.strip()] = val.strip()
