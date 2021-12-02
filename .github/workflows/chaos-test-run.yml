@@ -1,7 +1,7 @@
-name: Java CI - pulsar:chaos:test
+name: Chaos Test
 
 on:
-  issues:
+  issue_comment:
     types: [created]
 
 jobs:
@@ -12,14 +12,15 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     steps:
-      - uses: 'google-github-actions/setup-gcloud@master'
-        with:
-          project_id: 'affable-ray-226821'
+      - name: Dump GitHub context
+          env:
+            GITHUB_CONTEXT: ${{ toJSON(github) }}
+          run: echo "$GITHUB_CONTEXT"
 
       - name: 'install kubectl and helm'
         run: |
           echo 'install kubectl'
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.1/bin/linux/amd64/kubectl
           chmod +x ./kubectl
           sudo mv ./kubectl /usr/local/bin/kubectl
           echo 'install helm'

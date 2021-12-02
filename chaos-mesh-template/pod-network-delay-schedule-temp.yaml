@@ -1,0 +1,22 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Schedule
+metadata:
+  name: pod-network-delay
+  namespace: chaos-ns
+spec:
+  schedule: '*/5 * * * *'
+  historyLimit: 1000
+  concurrencyPolicy: 'Forbid'
+  type: 'NetworkChaos'
+  networkChaos:
+    action: delay
+      mode: one
+      selector:
+        namespaces:
+          - chaos-ns
+        labelSelectors:
+          'component': 'broker'
+      delay:
+        latency: '30ms'
+        correlation: '100'
+        jitter: '0ms'

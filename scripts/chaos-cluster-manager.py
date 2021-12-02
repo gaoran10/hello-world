@@ -18,21 +18,25 @@ class ChaosClusterManager:
         return json.loads(proc.stdout.decode('utf-8'))
 
     def load_configurations(self, comment_body):
-        configuration_body = None
-        if comment_body.startswith('== Chaos Cluster Configurations =='):
-            configuration_body = comment_body
+        if comment_body.find('== Chaos Cluster Configurations ==') == -1:
+            raise RuntimeError("Miss chaos cluster configuration header.")
 
-        if not configuration_body:
-            print('The arguments not generated yet')
-            return
+        is_config_area = False
+        for line in comment_body.splitlines():
+            if line.startswith('== Chaos Cluster Configurations =='):
+                is_config_area = True
 
-        for line in configuration_body.splitlines():
-            if not line.count(':'):
+            if not is_config_area or not line.count(':') or not linn.startswith('#'):
                 continue
+            elif line.startswith('== Chaos Cluster Configurations End =='):
+                break
 
             var, val = line.split(':')[0], ':'.join(line.split(':')[1:])
             os.environ['CHAOS_CLUSTER_' + var.strip()] = val.strip()
             print('add chaos cluster configuration in env. ', 'CHAOS_CLUSTER_' + var.strip(), '=', os.getenv('CHAOS_CLUSTER_' + var.strip()))
+
+        if os.getenv('CHAOS_CLUSTER_IMAGE_VERSION') is None or os.getenv('CHAOS_CLUSTER_IMAGE_VERSION') == '':
+            raise RuntimeError("Need to set the `streamnative/pulsar-all` image version.")
 
     def github_api_update_issue(self, issue_number, body):
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/{}'.format(issue_number)

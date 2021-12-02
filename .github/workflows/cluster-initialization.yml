@@ -1,7 +1,7 @@
-name: Java CI - pulsar:chaos-cluster:initialization
+name: Chaos Cluster Initialization
 
 on:
-  issue_comment:
+  issues:
     types: [created]
 
 jobs:
@@ -16,6 +16,16 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
+
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: check chaos-test label
+        run: |
+          sh ./hello/scripts/check-chaos-test-label.sh
 
       - name: 'install kubectl and helm'
         run: |
@@ -54,12 +64,6 @@ jobs:
           ref: gaoran/use-nio-netty-server-cnx-factory
           path: charts
 
-      - name: checkout hello-world repo
-        uses: actions/checkout@v2
-        with:
-          ref: master
-          path: hello
-
       - name: setup python
         uses: actions/setup-python@v2
         with:
@@ -73,37 +77,23 @@ jobs:
         run:
           pip install requests
 
-#      - name: deploy cluster
-#        env:
-#          GITHUB_USERNAME: gaoran10
-#          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
-#          ISSUE_NUMBER: ${{ github.event.issue.number }}
-#          RUN_ID: ${{ github.run_id }}
-#          COMMENT_BODY: ${{ github.event.issue.body }}
-#          TEST_ACTION: create
-#        run: |
-#          cd charts
-#          python ../hello/scripts/chaos-cluster-manager.py
-#          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
-#          helm repo add loki https://grafana.github.io/loki/charts
-#          helm dependency update charts/pulsar-custom
-#          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
-
-      - name: checkout chaos-test repo
-        uses: actions/checkout@v2
-        with:
-          repository: streamnative/chaos-test
-          token: ${{ secrets.RAN_GITHUB_TOKEN }}
-          ref: gaoran/adjust-chaos-test-workflow
-          path: chaos-test
-
-      - name: run test
+      - name: deploy cluster
+        env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN_ID: ${{ github.run_id }}
+          COMMENT_BODY: ${{ github.event.issue.body }}
+          TEST_ACTION: create
         run: |
-          cd ./chaos-test
-          nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.out 2>&1 &
-          mvn -Dtest=SimpleMessagingTest clean test
+          cd charts
+          python ../hello/scripts/chaos-cluster-manager.py
+          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
+          helm repo add loki https://grafana.github.io/loki/charts
+          helm dependency update charts/pulsar-custom
+          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
 
-      - name: check port forward log
+      - name: deploy cluster finish
         env:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
@@ -112,17 +102,4 @@ jobs:
           TEST_ACTION: finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          ps -ef | grep port-forward
-          cd ./chaos-test
-          cat port-forward.out
-
-#      - name: deploy cluster finish
-#        env:
-#          GITHUB_USERNAME: gaoran10
-#          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
-#          ISSUE_NUMBER: ${{ github.event.issue.number }}
-#          STATUS: ${{ job.status }}
-#          TEST_ACTION: finish
-#        if: ${{ always() ||  success() || cancelled() || failure() }}
-#        run: |
-#          python ./hello/scripts/chaos-cluster-manager.py
+          python ./hello/scripts/chaos-cluster-manager.py
