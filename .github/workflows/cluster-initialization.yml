@@ -84,7 +84,20 @@ jobs:
         run: |
           cd ./hello/chaos-mesh-template
           python chaos-mesh.py
-          kubectl port-forward -n chaos-testing svc/chaos-dashboard 2333:2333
+          kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650
+
+      - name: checkout chaos-test repo
+        uses: actions/checkout@v2
+        with:
+          repository: streamnative/chaos-test
+          token: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ref: gaoran/adjust-chaos-test-workflow
+          path: chaos-test
+
+      - name: run test
+        run: |
+          cd ./chaos-test
+          mvn -Dtest=SimpleMessagingTest clean test
 
       - name: deploy cluster finish
         env:
