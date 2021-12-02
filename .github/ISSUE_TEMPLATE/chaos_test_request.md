@@ -1,7 +1,7 @@
 ---
 name: Chaos test request
 about: Open a chaos test
-title: ''
+title: 'Chaos test'
 labels: type/chaos-test
 assignees: ''
 ---
