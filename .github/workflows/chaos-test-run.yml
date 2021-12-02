@@ -89,10 +89,10 @@ jobs:
           COMMENT_BODY: ${{ github.event.comment.body }}
           TEST_ACTION: create
         run: |
+          nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.log 2>&1 &
           python ./hello/scripts/chaos-test-workflow.py
           cd chaos-test
-          kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650
-          mvn -Dtest=SimpleMessagingTest clean test
+          mvn clean test
 
       - name: chaos test finish
         env:

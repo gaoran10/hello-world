@@ -39,6 +39,7 @@ class ChaosMeshEditor:
         self.write()
         os.system('cat ' + self._output_file_path)
         os.system('kubectl apply -f ' + self._output_file_path)
+        print('deploy file ', self._output_file_path)
 
     def add_label_selector(self, component):
         if self._is_scheduled:
@@ -67,10 +68,17 @@ class ChaosMeshEditor:
             random_str += random.choice(str)
         return random_str
 
-def main():
-    pod_failure_editor = ChaosMeshEditor(os.getenv('ISSUE_NUMBER'), 'pod-failure-schedule-temp.yaml', True)
-    pod_failure_editor.add_label_selector('broker')
-    pod_failure_editor.set_schedule('*/3 * * * *')
-    pod_failure_editor.deploy()
-
-main()
+def deploy_exps(exp_types, base_path="../chaos-mesh-template"):
+    if exp_types:
+        raise RuntimeError("No chaos-mesh experiments.")
+    for type in exp_types:
+        if type == 'POD_KILL':
+            editor = ChaosMeshEditor(os.getenv('ISSUE_NUMBER'), base_path + '/pod-kill-schedule-temp.yaml', True)
+            editor.add_label_selector('broker')
+            editor.set_schedule('*/5 * * * *')
+            editor.deploy()
+        elif type == 'NETWORK_DELAY':
+            editor = ChaosMeshEditor(os.getenv('ISSUE_NUMBER'), base_path + '/pod-network-delay-schedule-temp.yaml', True)
+            editor.add_label_selector('broker')
+            editor.set_schedule('*/5 * * * *')
+            editor.deploy()
