@@ -92,28 +92,13 @@ jobs:
           nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.log 2>&1 &
           python ./hello/scripts/chaos-test-workflow.py
 
-      - name: chaos test finish
+      - name: deploy cluster finish
         env:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           COMMENT_ID: ${{ github.event.comment.id }}
           STATUS: ${{ job.status }}
           TEST_ACTION: finish
+        if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
           python ./hello/scripts/chaos-test-workflow.py
-
-      - name: package reports
-        if: failure()
-        run: |
-          python ./hello/scripts/chaos-test-workflow.py
-          rm -rf artifacts
-          mkdir artifacts
-          find . -type d -name "reports" -exec cp --parents -R {} artifacts/ \;
-          zip -r artifacts.zip artifacts
-
-      - uses: actions/upload-artifact@master
-        name: upload reports
-        if: failure()
-        with:
-          name: artifacts
-          path: artifacts.zip
