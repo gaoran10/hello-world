@@ -4,4 +4,4 @@ label = "${LABEL}"
 
 if [ -z $label ]:
   echo 'Miss chaos-test label'
-  exit 1
+  exit 0

@@ -2,12 +2,12 @@
 name: Chaos test request
 about: Open a chaos test
 title: 'Chaos test'
-labels: type/chaos-test
-assignees: ''
+labels: ['chaos-test']
 ---
+
 # Chaos Test
 
-Create issue with tag type/chaos-test to create a new Pulsar cluster with specific version.
+Create an issue with tag type/chaos-test to create a new Pulsar cluster with a specific version.
 
 Currently, the default image is `streamnative/pulsar-all`
 
