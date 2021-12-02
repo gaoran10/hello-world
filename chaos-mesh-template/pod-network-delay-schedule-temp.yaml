@@ -10,13 +10,13 @@ spec:
   type: 'NetworkChaos'
   networkChaos:
     action: delay
-      mode: one
-      selector:
-        namespaces:
-          - chaos-ns
-        labelSelectors:
-          'component': 'broker'
-      delay:
-        latency: '30ms'
-        correlation: '100'
-        jitter: '0ms'
+    mode: one
+    selector:
+      namespaces:
+        - chaos-ns
+      labelSelectors:
+        'component': 'broker'
+    delay:
+      latency: '30ms'
+      correlation: '100'
+      jitter: '0ms'
