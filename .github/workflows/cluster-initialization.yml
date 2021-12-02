@@ -83,7 +83,6 @@ jobs:
           TEST_ACTION: create
         run: |
           cd ./hello/chaos-mesh-template
-          python chaos-mesh.py
           kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650
 
       - name: checkout chaos-test repo
