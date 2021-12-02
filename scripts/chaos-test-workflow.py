@@ -101,7 +101,7 @@ def main():
         deploy_exps(chaos_test_manager.get_chaos_exps(), './hello/chaos-mesh-template')
         test_res = os.system("cd chaos-test && mvn clean install -Dpulsar.deployment.type=EXTERNAL -Dchaos.test.duration=" + os.getenv('CHAOS_TEST_TEST_DURATION'))
         if test_res != 0:
-            exit test_res
+            raise RuntimeError("Chaos test failed code " + test_res + ".")
     elif test_action == 'finish':
         print('chaos test finish ...')
         comment = chaos_test_manager.github_api_get_comment(comment_id)
