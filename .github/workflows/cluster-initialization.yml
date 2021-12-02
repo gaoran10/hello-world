@@ -83,7 +83,6 @@ jobs:
           TEST_ACTION: create
         run: |
           cd ./hello/chaos-mesh-template
-          nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.out 2>&1 &
 
       - name: checkout chaos-test repo
         uses: actions/checkout@v2
@@ -96,6 +95,7 @@ jobs:
       - name: run test
         run: |
           cd ./chaos-test
+          nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.out 2>&1 &
           mvn -Dtest=SimpleMessagingTest clean test
 
       - name: deploy cluster finish
