@@ -97,6 +97,8 @@ jobs:
           cd ./chaos-test
           nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.out 2>&1 &
           mvn -Dtest=SimpleMessagingTest clean test
+          echo 'check port forward log'
+          cat port-forward.out
 
       - name: deploy cluster finish
         env:
