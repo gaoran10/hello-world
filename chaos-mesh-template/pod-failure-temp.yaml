@@ -10,5 +10,5 @@ spec:
   selector:
     labelSelectors:
       component: selector-component
-      namespaces:
-        - selector-ns
+    namespaces:
+      - selector-ns
