@@ -1,4 +1,4 @@
-name: Chaos Cluster Initialization
+name: Chaos Cluster Destroy
 
 on:
   issues:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   chaos-pulsar-cluster:
-    name: prepare chaos Pulsar cluster
+    name: destroy chaos Pulsar cluster
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -59,7 +59,7 @@ jobs:
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
 
-      - name: deploy cluster
+      - name: destroy cluster
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
