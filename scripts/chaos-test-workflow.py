@@ -4,9 +4,8 @@ import os
 import json
 import subprocess
 import requests
+from chaos_mesh import deploy_exps
 from requests.auth import HTTPBasicAuth
-
-import chaos_mesh import deploy_exps
 
 class ChaosTestManager:
 
