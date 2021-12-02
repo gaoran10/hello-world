@@ -38,7 +38,7 @@ class ChaosMeshEditor:
     def deploy(self):
         self.write()
         os.system('cat ' + self._output_file_path)
-#         os.system('kubectl apply -f ' + self._output_file_path)
+        os.system('kubectl apply -f ' + self._output_file_path)
         print('deploy file ', self._output_file_path)
 
     def add_label_selector(self, component):
@@ -83,5 +83,3 @@ def deploy_exps(exp_types, base_path="../chaos-mesh-template"):
             editor.add_label_selector('broker')
             editor.set_schedule('*/5 * * * *')
             editor.deploy()
-
-deploy_exps(['POD_KILL', 'NETWORK_DELAY'], 'chaos-mesh-template')
