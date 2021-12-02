@@ -99,6 +99,8 @@ def main():
         chaos_test_manager.get_chaos_test_configurations(comment_body)
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
         deploy_exps(chaos_test_manager.get_chaos_exps(), './hello/chaos-mesh-template')
+        os.system("cd chaos-test")
+        os.system("mvn clean install -Dpulsar.deployment.type=EXTERNAL -Dchaos.test.duration=" + os.getenv('CHAOS_TEST_TEST_DURATION'))
     elif test_action == 'finish':
         print('chaos test finish ...')
         comment = chaos_test_manager.github_api_get_comment(comment_id)
