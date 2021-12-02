@@ -82,8 +82,8 @@ jobs:
           COMMENT_BODY: ${{ github.event.issue.body }}
           TEST_ACTION: create
         run: |
-          cd charts
-          python ../hello/chaos-mesh-template/chaos-mesh.py
+          cd ./hello/chaos-mesh-template
+          python chaos-mesh.py
 
       - name: deploy cluster finish
         env:
