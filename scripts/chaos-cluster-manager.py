@@ -26,7 +26,7 @@ class ChaosClusterManager:
             if line.startswith('== Chaos Cluster Configurations =='):
                 is_config_area = True
 
-            if not is_config_area or not line.count(':') or not linn.startswith('#'):
+            if not is_config_area or not line.count(':') or not line.startswith('#'):
                 continue
             elif line.startswith('== Chaos Cluster Configurations End =='):
                 break

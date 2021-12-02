@@ -27,7 +27,7 @@ jobs:
         env:
           COMMENT_BODY: ${{ github.event.issue.body }}
         run: |
-          sh ./hello/scripts/check-chaos-test-label.sh
+          sh ./hello/scripts/check-chaos-test.sh
 
       - name: 'install kubectl and helm'
         run: |
