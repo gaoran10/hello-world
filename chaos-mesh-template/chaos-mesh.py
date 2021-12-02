@@ -7,7 +7,7 @@ from ruamel.yaml import YAML
 
 class ChaosMeshEditor:
 
-    base_ns_name = 'chaos-ns-'
+    base_ns_name = 'chaos-'
 
     def __init__(self, issue_number, input_file_path, is_scheduled=False):
         self._issue_number = issue_number
