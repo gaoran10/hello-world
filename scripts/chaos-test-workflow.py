@@ -40,10 +40,11 @@ class ChaosTestManager:
             var, val = line.split(':')[0], ':'.join(line.split(':')[1:])
             os.environ['CHAOS_TEST_' + var.strip()] = val.strip()
             print('add chaos test configuration in env. ', 'CHAOS_TEST_' + var.strip(), '=', os.getenv('CHAOS_TEST_' + var.strip()))
-            if var.strip() == 'CHAOS_EXPS':
-                for exp in val.strip().split(",")
+            print('var.strip: ', var.strip())
+            if var.strip().startswith('CHAOS_EXP'):
+                for exp in val.strip().split(","):
                     self.chaos_exps.append(exp.strip())
-            print('chaos exps: ', self.chaos_exps)
+                print('chaos exps: ', self.chaos_exps)
 
     def github_api_create_comment(self, number, body):
         body = body.replace('\n', '\\n')
