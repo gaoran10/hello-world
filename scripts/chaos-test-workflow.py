@@ -102,8 +102,8 @@ def main():
 
         command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean test"
         command += " -Dpulsar.deployment.type=EXTERNAL"
-        command += " -Dpulsar.external.service.domain=" + os.getenv('CHAOS_TEST_EXTERNAL_SERVICE_DOMAIN')
-        command += " -Dchaos.test.duration=" + os.getenv('CHAOS_TEST_TEST_DURATION')
+        command += " -Dpulsar.external.service.domain=" + str(os.getenv('CHAOS_TEST_EXTERNAL_SERVICE_DOMAIN'))
+        command += " -Dchaos.test.duration=" + str(os.getenv('CHAOS_TEST_TEST_DURATION'))
         test_res = os.system(command)
         if test_res != 0:
             raise RuntimeError("Chaos test failed code " + test_res + ".")
