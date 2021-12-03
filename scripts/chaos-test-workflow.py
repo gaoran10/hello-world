@@ -110,6 +110,7 @@ def main():
         command += " -Dpulsar.deployment.type=EXTERNAL"
         command += " -Dpulsar.external.service.domain=" + str(os.getenv('CHAOS_TEST_EXTERNAL_SERVICE_DOMAIN'))
         command += " -Dchaos.test.duration=" + str(os.getenv('CHAOS_TEST_TEST_DURATION'))
+        print('run command: ', command)
         test_res = os.system(command)
         if test_res != 0:
             raise RuntimeError("Chaos test failed code " + test_res + ".")
