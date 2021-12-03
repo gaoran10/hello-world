@@ -99,7 +99,12 @@ def main():
         chaos_test_manager.get_chaos_test_configurations(comment_body)
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
         deploy_exps(chaos_test_manager.get_chaos_exps(), './hello/chaos-mesh-template')
-        test_res = os.system("cd chaos-test && mvn -Dtest=SimpleMessagingTest clean install -Dpulsar.deployment.type=EXTERNAL -Dchaos.test.duration=" + os.getenv('CHAOS_TEST_TEST_DURATION'))
+
+        command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean install"
+        command += " -Dpulsar.deployment.type=EXTERNAL"
+        command += " -Dpulsar.external.service.domain=" + os.getenv('CHAOS_TEST_EXTERNAL_SERVICE_DOMAIN')
+        command += " -Dchaos.test.duration=" + os.getenv('CHAOS_TEST_TEST_DURATION')
+        test_res = os.system(command)
         if test_res != 0:
             raise RuntimeError("Chaos test failed code " + test_res + ".")
     elif test_action == 'finish':
