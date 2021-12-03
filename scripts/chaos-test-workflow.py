@@ -11,6 +11,7 @@ class ChaosTestManager:
 
     configuration = {}
     chaos_exps = []
+    chaos_exps_params = {}
 
     def github_api_query_comments(self):
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/{}/comments?per_page=100'.format(os.getenv('ISSUE_NUMBER'))
@@ -45,6 +46,8 @@ class ChaosTestManager:
                 for exp in val.strip().split(","):
                     self.chaos_exps.append(exp.strip())
                 print('chaos exps: ', self.chaos_exps)
+            if var.strip().startswith('CHAOS_PARAM'):
+                self.chaos_exps_params[var.strip()] = val.strip()
 
     def github_api_create_comment(self, number, body):
         body = body.replace('\n', '\\n')
@@ -88,6 +91,9 @@ class ChaosTestManager:
     def get_chaos_exps(self):
         return self.chaos_exps
 
+    def get_chaos_exps_params(self):
+        return self.chaos_exps_params
+
 def main():
     chaos_test_manager = ChaosTestManager()
     test_action = os.getenv('TEST_ACTION')
@@ -98,7 +104,7 @@ def main():
         print('chaos test create ...')
         chaos_test_manager.get_chaos_test_configurations(comment_body)
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
-        deploy_exps(chaos_test_manager.get_chaos_exps(), './hello/chaos-mesh-template')
+        deploy_exps(chaos_test_manager.get_chaos_exps(), chaos_test_manager.get_chaos_exps_params(), './hello/chaos-mesh-template')
 
         command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean test"
         command += " -Dpulsar.deployment.type=EXTERNAL"

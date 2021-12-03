@@ -28,6 +28,8 @@ Create a new comment to add chaos-mesh experiments and run chaos test.
 ```
 # streamnative/pulsar-all
 CHAOS_EXPS: POD_KILL, NETWORK_DELAY
+CHAOS_PARAM_POD_KILL_CRON: */5 * * * *
+CHAOS_PARAM_NETWORK_DELAY: */5 * * * *
 NETWORK_DEALY_TIMES: 30ms
 TEST_DURATION: 100min
 EXTERNAL_SERVICE_DOMAIN: localhost

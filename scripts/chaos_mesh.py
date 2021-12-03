@@ -68,18 +68,24 @@ class ChaosMeshEditor:
             random_str += random.choice(str)
         return random_str
 
-def deploy_exps(exp_types, base_path="../chaos-mesh-template"):
-    print('deploy exps: ', exp_types)
+def deploy_exps(exp_types, exp_params, base_path="../chaos-mesh-template"):
+    print('deploy exps types: ', exp_types, ', exp_params: ', exp_params)
     if not exp_types:
         raise RuntimeError("No chaos-mesh experiments.")
     for type in exp_types:
         if type == 'POD_KILL':
             editor = ChaosMeshEditor(os.getenv('ISSUE_NUMBER'), base_path + '/pod-kill-schedule-temp.yaml', True)
             editor.add_label_selector('broker')
-            editor.set_schedule('*/5 * * * *')
+            if exp_params['CHAOS_PARAM_POD_KILL_CRON']:
+                editor.set_schedule(exp_params['CHAOS_PARAM_POD_KILL_CRON'])
+            else:
+                editor.set_schedule('*/5 * * * *')
             editor.deploy()
         elif type == 'NETWORK_DELAY':
             editor = ChaosMeshEditor(os.getenv('ISSUE_NUMBER'), base_path + '/pod-network-delay-schedule-temp.yaml', True)
             editor.add_label_selector('broker')
-            editor.set_schedule('*/5 * * * *')
+            if exp_params['CHAOS_PARAM_NETWORK_DELAY']:
+                editor.set_schedule(exp_params['CHAOS_PARAM_NETWORK_DELAY'])
+            else:
+                editor.set_schedule('*/5 * * * *')
             editor.deploy()
