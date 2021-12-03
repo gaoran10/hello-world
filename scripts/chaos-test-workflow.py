@@ -100,7 +100,7 @@ def main():
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
         deploy_exps(chaos_test_manager.get_chaos_exps(), './hello/chaos-mesh-template')
 
-        command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean install"
+        command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean test"
         command += " -Dpulsar.deployment.type=EXTERNAL"
         command += " -Dpulsar.external.service.domain=" + os.getenv('CHAOS_TEST_EXTERNAL_SERVICE_DOMAIN')
         command += " -Dchaos.test.duration=" + os.getenv('CHAOS_TEST_TEST_DURATION')
