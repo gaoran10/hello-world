@@ -1,7 +1,7 @@
 ---
 name: Chaos test request
 about: Open a chaos test
-title: 'Chaos test'
+title: 'Chaos test streamnative/sn-platform:2.9.0.0-rc-6'
 labels: ['chaos-test']
 ---
 
