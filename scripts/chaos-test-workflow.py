@@ -106,9 +106,14 @@ def main():
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
         deploy_exps(chaos_test_manager.get_chaos_exps(), chaos_test_manager.get_chaos_exps_params(), './hello/chaos-mesh-template')
 
+        istio_external_ip = subprocess.os.popen("kubectl get svc -n istio-system | grep ingress | awk '{print$4}'").read().strip()
+        print('istio external ip: ', istio_external_ip)
+        pulsar_proxy_external_ip = subprocess.os.popen("kubectl get svc -n chaos-" + os.getenv('ISSUE_NUMBER') + " | grep proxy | awk '{print$4}'").read().strip()
+        print('pulsar proxy external ip: ', pulsar_proxy_external_ip)
+
         command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean test"
         command += " -Dpulsar.deployment.type=EXTERNAL"
-        command += " -Dpulsar.external.service.domain=" + str(os.getenv('CHAOS_TEST_EXTERNAL_SERVICE_DOMAIN'))
+        command += " -Dpulsar.external.service.domain=" + pulsar_proxy_external_ip
         command += " -Dchaos.test.duration=" + str(os.getenv('CHAOS_TEST_TEST_DURATION'))
         print('run command: ', command)
         test_res = os.system(command)
