@@ -110,11 +110,15 @@ def main():
         print('istio external ip: ', istio_external_ip)
         pulsar_proxy_external_ip = subprocess.os.popen("kubectl get svc -n chaos-" + os.getenv('ISSUE_NUMBER') + " | grep proxy | awk '{print$4}'").read().strip()
         print('pulsar proxy external ip: ', pulsar_proxy_external_ip)
+        for i in range(3):
+            subprocess.os.popen("echo '" + istio_external_ip + " chaos-pulsar-" + os.getenv('ISSUE_NUMBER') + "-broker-" + i + ".pulsar.kop.service' >> /etc/hosts")
+        os.system('cat /etc/hosts')
 
         command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean test"
         command += " -Dpulsar.deployment.type=EXTERNAL"
         command += " -Dpulsar.external.service.domain=" + pulsar_proxy_external_ip
         command += " -Dchaos.test.duration=" + str(os.getenv('CHAOS_TEST_TEST_DURATION'))
+        command += " -Dchaos.test.istio.external.ip=" + istio_external_ip
         print('run command: ', command)
         test_res = os.system(command)
         if test_res != 0:
