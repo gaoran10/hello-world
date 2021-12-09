@@ -93,6 +93,7 @@ jobs:
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
+          kubectl create secret generic chaos-pulsar-tls-proxy -n 'chaos-${{ github.event.issue.number }}' --from-file=../hello/secure/kop/keystore.jks --from-file=../hello/secure/kop/truststore.jks
           helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
 
       - name: deploy cluster finish

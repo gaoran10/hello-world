@@ -11,12 +11,12 @@ labels: ['chaos-test']
 
 Create an issue with tag type/chaos-test to create a new Pulsar cluster with a specific version.
 
-Currently, the default image is `streamnative/pulsar-all`
+Currently, the default image is `streamnative/sn-platform`
 
 Set Pulsar image version here.
 == Chaos Cluster Configurations ==
 ```
-# streamnative/pulsar-all
+# streamnative/sn-platform
 IMAGE_VERSION: 2.10.0-rc-202111212205
 ```
 == Chaos Cluster Configurations End ==

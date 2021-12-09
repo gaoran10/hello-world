@@ -1,0 +1,3 @@
+keystore.jks -> 123123
+truststore.jks -> 123123
+client.truststore.jks -> 456456
