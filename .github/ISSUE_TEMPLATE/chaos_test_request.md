@@ -17,7 +17,7 @@ Set Pulsar image version here.
 == Chaos Cluster Configurations ==
 ```
 # streamnative/sn-platform
-IMAGE_VERSION: 2.10.0-rc-202111212205
+IMAGE_VERSION: 2.9.0.0-rc-6
 ```
 == Chaos Cluster Configurations End ==
 
@@ -26,7 +26,6 @@ IMAGE_VERSION: 2.10.0-rc-202111212205
 Create a new comment to add chaos-mesh experiments and run chaos test.
 == Chaos Test Configurations ==
 ```
-# streamnative/pulsar-all
 CHAOS_EXPS: POD_KILL, NETWORK_DELAY
 CHAOS_PARAM_POD_KILL_CRON: */5 * * * *
 CHAOS_PARAM_NETWORK_DELAY: */5 * * * *
