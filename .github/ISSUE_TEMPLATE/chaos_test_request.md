@@ -17,19 +17,24 @@ Set Pulsar image version here.
 == Chaos Cluster Configurations ==
 ```
 # streamnative/sn-platform
+IMAGE_NAME: streamnative/sn-platform
 IMAGE_VERSION: 2.9.0.0-rc-6
+CHAOS_EXPS: POD_KILL, NETWORK_DELAY
+CHAOS_PARAM_POD_KILL_CRON: */5 * * * *
+CHAOS_PARAM_NETWORK_DELAY: */5 * * * *
+NETWORK_DEALY_TIMES: 30ms
 ```
 == Chaos Cluster Configurations End ==
 
 ## 2. Add chaos-mesh and test
 
 Create a new comment to add chaos-mesh experiments and run chaos test.
+Support test:
+- SimpleMessagingTest
+- KoPTest
 == Chaos Test Configurations ==
 ```
-CHAOS_EXPS: POD_KILL, NETWORK_DELAY
-CHAOS_PARAM_POD_KILL_CRON: */5 * * * *
-CHAOS_PARAM_NETWORK_DELAY: */5 * * * *
-NETWORK_DEALY_TIMES: 30ms
+TEST_NAME: SimpleMessagingTest
 TEST_DURATION: 100min
 EXTERNAL_SERVICE_DOMAIN: localhost
 ```

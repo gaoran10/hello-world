@@ -1,9 +1,19 @@
-name: Chaos Cluster Initialization
+name: Chaos Cluster Initialization Manually
 
 on:
-  issues:
-    types: [opened]
-
+  workflow_dispatch:
+    inputs:
+      clusterId:
+        description: 'Cluster ID in test platform'
+        required: true
+      imageName:
+        description: 'The Pulsar image name'
+        required: false
+        default: 'streamnative/sn-platform'
+      imageVersion:
+        description: 'The Pulsar image version'
+        required: false
+        default: '2.9.0.0-rc-6'
 jobs:
   chaos-pulsar-cluster:
     name: prepare chaos Pulsar cluster
@@ -83,20 +93,20 @@ jobs:
         env:
           GITHUB_USERNAME: gaoran10
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
           RUN_ID: ${{ github.run_id }}
-          COMMENT_BODY: ${{ github.event.issue.body }}
           TEST_ACTION: create
+          IMAGE_NAME: ${{ github.event.inputs.imageName }}
+          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
           cd charts
-          python ../hello/scripts/chaos-cluster-manager.py
-          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.issue.number }}' -k 'chaos-pulsar-${{ github.event.issue.number }}' -c
+          ./scripts/pulsar/change_pulsar_image.sh
+          python ../hello/scripts/chaos-cluster-manager.py ${{ github.event.inputs.imageVersion }}
+          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
-          kubectl label namespace 'chaos-${{ github.event.issue.number }}' istio-injection=enabled
-          kubectl create secret generic chaos-pulsar-${{ github.event.issue.number }}-tls-proxy -n 'chaos-${{ github.event.issue.number }}' --from-file=../hello/secure/kop/keystore.jks --from-file=../hello/secure/kop/truststore.jks
-          helm install --set initialize=true --set namespace='chaos-${{ github.event.issue.number }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.issue.number }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
-          python ../hello/scripts/chaos-exps-manager.py
+          kubectl label namespace 'chaos-${{ github.event.inputs.clusterID }}' istio-injection=enabled
+          kubectl create secret generic chaos-pulsar-${{ github.event.inputs.clusterID }}-tls-proxy -n 'chaos-${{ github.event.inputs.clusterID }}' --from-file=../hello/secure/kop/keystore.jks --from-file=../hello/secure/kop/truststore.jks
+          helm install --set initialize=true --set namespace='chaos-${{ github.event.inputs.clusterID }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.inputs.clusterID }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
 
       - name: deploy cluster finish
         env:

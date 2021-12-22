@@ -10,8 +10,8 @@ from requests.auth import HTTPBasicAuth
 class ChaosTestManager:
 
     configuration = {}
-    chaos_exps = []
-    chaos_exps_params = {}
+#     chaos_exps = []
+#     chaos_exps_params = {}
 
     def github_api_query_comments(self):
         url = 'https://api.github.com/repos/gaoran10/hello-world/issues/{}/comments?per_page=100'.format(os.getenv('ISSUE_NUMBER'))
@@ -42,12 +42,16 @@ class ChaosTestManager:
             os.environ['CHAOS_TEST_' + var.strip()] = val.strip()
             print('add chaos test configuration in env. ', 'CHAOS_TEST_' + var.strip(), '=', os.getenv('CHAOS_TEST_' + var.strip()))
             print('var.strip: ', var.strip())
-            if var.strip().startswith('CHAOS_EXP'):
-                for exp in val.strip().split(","):
-                    self.chaos_exps.append(exp.strip())
-                print('chaos exps: ', self.chaos_exps)
-            if var.strip().startswith('CHAOS_PARAM'):
-                self.chaos_exps_params[var.strip()] = val.strip()
+#             if var.strip().startswith('CHAOS_EXP'):
+#                 for exp in val.strip().split(","):
+#                     self.chaos_exps.append(exp.strip())
+#                 print('chaos exps: ', self.chaos_exps)
+#             if var.strip().startswith('CHAOS_PARAM'):
+#                 self.chaos_exps_params[var.strip()] = val.strip()
+
+        if os.getenv('CHAOS_TEST_TEST_NAME') is None or os.getenv('CHAOS_TEST_TEST_NAME') == '':
+            raise RuntimeError("Need to set the test name.")
+
 
     def github_api_create_comment(self, number, body):
         body = body.replace('\n', '\\n')
@@ -88,11 +92,11 @@ class ChaosTestManager:
         print('link_action_with_issue body: ', body)
         self.github_api_update_comment(comment_id, body)
 
-    def get_chaos_exps(self):
-        return self.chaos_exps
-
-    def get_chaos_exps_params(self):
-        return self.chaos_exps_params
+#     def get_chaos_exps(self):
+#         return self.chaos_exps
+#
+#     def get_chaos_exps_params(self):
+#         return self.chaos_exps_params
 
 def main():
     chaos_test_manager = ChaosTestManager()
@@ -104,7 +108,7 @@ def main():
         print('chaos test create ...')
         chaos_test_manager.get_chaos_test_configurations(comment_body)
         chaos_test_manager.link_action_with_issue(comment_id, test_action, comment_body)
-        deploy_exps(chaos_test_manager.get_chaos_exps(), chaos_test_manager.get_chaos_exps_params(), './hello/chaos-mesh-template')
+#         deploy_exps(chaos_test_manager.get_chaos_exps(), chaos_test_manager.get_chaos_exps_params(), './hello/chaos-mesh-template')
 
         istio_external_ip = subprocess.os.popen("kubectl get svc -n istio-system | grep ingress | awk '{print$4}'").read().strip()
         print('istio external ip: ', istio_external_ip)
@@ -114,7 +118,7 @@ def main():
             subprocess.os.popen("echo '" + istio_external_ip + " chaos-pulsar-" + os.getenv('ISSUE_NUMBER') + "-broker-" + i + ".pulsar.kop.service' >> /etc/hosts")
         os.system('cat /etc/hosts')
 
-        command = "cd chaos-test && mvn -Dtest=SimpleMessagingTest clean test"
+        command = "cd chaos-test && mvn -Dtest=" + os.getenv('CHAOS_TEST_TEST_NAME') + " clean test"
         command += " -Dpulsar.deployment.type=EXTERNAL"
         command += " -Dpulsar.external.service.domain=" + pulsar_proxy_external_ip
         command += " -Dchaos.test.duration=" + str(os.getenv('CHAOS_TEST_TEST_DURATION'))
