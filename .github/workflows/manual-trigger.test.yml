@@ -1,0 +1,28 @@
+name: Manually triggered workflow
+on:
+  workflow_dispatch:
+    inputs:
+      clusterId:
+        description: 'test platform cluster id'
+        require: true
+      imageName:
+        description: 'image name'
+        required: true
+        default: 'streamnative/sn-platform'
+      imageVersion:
+        description: 'image version'
+        required: true
+
+jobs:
+  say_hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "imageName: ${{ github.event.inputs.imageName }}"
+          echo "imageVersion: ${{ github.event.inputs.imageVersion }}"
