@@ -17,12 +17,13 @@ jobs:
   say_hello:
     runs-on: ubuntu-latest
     steps:
+      - name: cluster-id-${{ github.event.inputs.clusterId }}"
+        run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "imageName: ${{ github.event.inputs.imageName }}"
+          echo "imageVersion: ${{ github.event.inputs.imageVersion }}"
+
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
-
-      - run: |
-          echo "clusterId: ${{ github.event.inputs.clusterId }}"
-          echo "imageName: ${{ github.event.inputs.imageName }}"
-          echo "imageVersion: ${{ github.event.inputs.imageVersion }}"
