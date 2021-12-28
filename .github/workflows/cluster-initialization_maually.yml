@@ -38,12 +38,6 @@ jobs:
           ref: master
           path: hello
 
-      - name: check chaos-test label
-        env:
-          COMMENT_BODY: ${{ github.event.issue.body }}
-        run: |
-          sh ./hello/scripts/check-chaos-test.sh
-
       - name: 'install kubectl and helm'
         run: |
           echo 'install kubectl'
