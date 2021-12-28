@@ -9,7 +9,7 @@ on:
 
 jobs:
   chaos-pulsar-cluster:
-    name: destroy chaos Pulsar cluster
+    name: DestroyCluster_${{ github.event.inputs.clusterId }}
     permissions:
       contents: 'read'
       id-token: 'write'
