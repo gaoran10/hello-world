@@ -15,7 +15,7 @@ on:
 
 jobs:
   chaos-pulsar-cluster:
-    name: prepare chaos Pulsar cluster
+    name: PrepareCluster_${{ github.event.inputs.clusterId }}
     permissions:
       contents: 'read'
       id-token: 'write'
