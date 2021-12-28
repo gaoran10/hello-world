@@ -115,7 +115,7 @@ jobs:
           TEST_ACTION: finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          python ./hello/scripts/chaos-test-workflow.py
+          python ./hello/scripts/chaos-test-workflow-manually.py
           pwd
           ls ./chaos-test/target
           zip -r -y ./artifacts.zip ./chaos-test/target/surefire-reports/
