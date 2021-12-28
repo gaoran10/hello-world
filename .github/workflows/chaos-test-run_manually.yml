@@ -1,0 +1,128 @@
+name: Chaos Test Maually
+
+on:
+  workflow_dispatch:
+    inputs:
+      clusterId:
+        description: 'The cluster id'
+        required: true
+      testId:
+        description: 'The test id'
+        required: true
+      testName:
+        description: 'The test method name'
+        required: true
+      duration:
+        description: 'Test duration'
+        required: true
+
+jobs:
+  chaos-test:
+    name: run chaos test
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: TestId_${{ github.event.inputs.testId }}
+        run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "testId: ${{ github.event.inputs.testId }}"
+          echo "testName: ${{ github.event.inputs.testName }}"
+          echo "duration: ${{ github.event.inputs.duration }}"
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: 'install kubectl and helm'
+        run: |
+          echo 'install kubectl'
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.1/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          echo 'install helm'
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - uses: 'google-github-actions/setup-gcloud@master'
+        with:
+          project_id: 'affable-ray-226821'
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
+          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
+
+      # Authenticate using the created credentials file.
+      #
+      # WARNING: The --cred-file flag is in preview and is subject to change.
+      - name: 'gcloud login'
+        run: |
+          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+          gcloud config set compute/zone us-east4-b
+          echo "------------------- get-credentials -------------------"
+          gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: checkout chaos-test repo
+        uses: actions/checkout@v2
+        with:
+          repository: streamnative/chaos-test
+          token: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ref: gaoran/adjust-chaos-test-workflow
+          path: chaos-test
+
+#          nohup kubectl port-forward -n 'chaos-${{ github.event.issue.number }}' svc/chaos-pulsar-${{ github.event.issue.number }}-proxy 6650:6650 8080:8080 > port-forward.log 2>&1 &
+
+      - name: chaos test create
+        env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+          RUN_ID: ${{ github.run_id }}
+          TEST_ACTION: create
+          CLUSTER_ID: ${{ github.event.inputs.clusterId }}
+          TEST_NAME: ${{ github.event.inputs.testName }}
+          TEST_DURATION: ${{ github.event.inputs.duration }}
+        run: |
+          python ./hello/scripts/chaos-test-workflow-manually.py
+
+      - name: chaos test finish
+        env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+          STATUS: ${{ job.status }}
+          TEST_ACTION: finish
+        if: ${{ always() ||  success() || cancelled() || failure() }}
+        run: |
+          python ./hello/scripts/chaos-test-workflow.py
+          pwd
+          ls ./chaos-test/target
+          zip -r -y ./artifacts.zip ./chaos-test/target/surefire-reports/
+
+      - uses: actions/upload-artifact@master
+        name: upload surefire-artifacts
+        if: ${{ always() ||  success() || cancelled() || failure() }}
+        with:
+          name: surefire-artifacts
+          path: artifacts.zip
