@@ -98,8 +98,8 @@ jobs:
           IMAGE_NAME: ${{ github.event.inputs.imageName }}
           IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
-          cd charts
           python ./hello/scripts/chaos-cluster-manager-manually.py
+          cd charts
           ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
           helm repo add loki https://grafana.github.io/loki/charts
