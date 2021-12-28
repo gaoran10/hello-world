@@ -18,7 +18,7 @@ on:
 
 jobs:
   chaos-test:
-    name: run chaos test
+    name: RunTest_${{ github.event.inputs.testId }}
     permissions:
       contents: 'read'
       id-token: 'write'
