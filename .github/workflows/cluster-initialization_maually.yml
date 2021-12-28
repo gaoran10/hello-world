@@ -12,6 +12,7 @@ on:
       imageVersion:
         description: 'The Pulsar image version'
         required: true
+
 jobs:
   chaos-pulsar-cluster:
     name: prepare chaos Pulsar cluster
