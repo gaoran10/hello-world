@@ -8,12 +8,10 @@ on:
         required: true
       imageName:
         description: 'The Pulsar image name'
-        required: false
-        default: 'streamnative/sn-platform'
+        required: true
       imageVersion:
         description: 'The Pulsar image version'
-        required: false
-        default: '2.9.0.0-rc-6'
+        required: true
 jobs:
   chaos-pulsar-cluster:
     name: prepare chaos Pulsar cluster
@@ -22,6 +20,12 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     steps:
+      - name: ClusterId_${{ github.event.inputs.clusterId }}
+        run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "imageName: ${{ github.event.inputs.imageName }}"
+          echo "imageVersion: ${{ github.event.inputs.imageVersion }}"
+
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
@@ -95,12 +99,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
           RUN_ID: ${{ github.run_id }}
           TEST_ACTION: create
+          CLUSTER_ID: ${{ github.event.inputs.clusterId }}
           IMAGE_NAME: ${{ github.event.inputs.imageName }}
           IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
           cd charts
-          ./scripts/pulsar/change_pulsar_image.sh
-          python ../hello/scripts/chaos-cluster-manager.py ${{ github.event.inputs.imageVersion }}
+          python ./hello/scripts/chaos-cluster-manager-manually.py
+          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
@@ -117,4 +122,4 @@ jobs:
           TEST_ACTION: finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          python ./hello/scripts/chaos-cluster-manager.py
+          python ./hello/scripts/chaos-cluster-manager-manually.py
