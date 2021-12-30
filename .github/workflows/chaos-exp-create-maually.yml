@@ -1,0 +1,110 @@
+name: Chaos Cluster Initialization Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      expId:
+        description: 'Chaos exp ID'
+        required: true
+
+jobs:
+  chaos-pulsar-cluster:
+    name: AddChaosExp_${{ github.event.inputs.expId }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ExpId_${{ github.event.inputs.expId }}
+        run: |
+          echo "expId: ${{ github.event.inputs.expId }}"
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: start hook
+        run: |
+          ./hello/scripts/test-platform-hook.py start_chaos ${{ github.event.inputs.expId }}
+
+      - name: 'install kubectl and helm'
+        run: |
+          echo 'install kubectl'
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.1/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          echo 'install helm'
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - uses: 'google-github-actions/setup-gcloud@master'
+        with:
+          project_id: 'affable-ray-226821'
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
+          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
+
+      # Authenticate using the created credentials file.
+      #
+      # WARNING: The --cred-file flag is in preview and is subject to change.
+      - name: 'gcloud login'
+        run: |
+          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+          gcloud config set compute/zone us-east4-b
+          echo "------------------- get-credentials -------------------"
+          gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
+
+      - name: checkout chars repo
+        uses: actions/checkout@v2
+        with:
+          repository: gaoran10/charts
+          ref: gaoran/use-nio-netty-server-cnx-factory
+          path: charts
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
+#      - name: deploy cluster
+#        env:
+#          GITHUB_USERNAME: gaoran10
+#          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+#          RUN_ID: ${{ github.run_id }}
+#          TEST_ACTION: create
+#          CLUSTER_ID: ${{ github.event.inputs.clusterId }}
+#          IMAGE_NAME: ${{ github.event.inputs.imageName }}
+#          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
+#        run: |
+#          python ./hello/scripts/chaos-cluster-manager-manually.py
+#          cd charts
+#          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
+#          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
+#          helm repo add loki https://grafana.github.io/loki/charts
+#          helm dependency update charts/pulsar-custom
+#          kubectl label namespace 'chaos-${{ github.event.inputs.clusterID }}' istio-injection=enabled
+#          kubectl create secret generic chaos-pulsar-${{ github.event.inputs.clusterID }}-tls-proxy -n 'chaos-${{ github.event.inputs.clusterID }}' --from-file=../hello/secure/kop/keystore.jks --from-file=../hello/secure/kop/truststore.jks
+#          helm install --set initialize=true --set namespace='chaos-${{ github.event.inputs.clusterID }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.inputs.clusterID }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
+
+      - name: create chaos exp finish
+        if: ${{ always() ||  success() || cancelled() || failure() }}
+        run: |
+          python ./hello/scripts/test-platform-hook.py start_finish_chaos ${{ github.event.inputs.expId }}
