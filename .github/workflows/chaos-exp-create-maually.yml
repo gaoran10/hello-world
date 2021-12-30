@@ -1,4 +1,4 @@
-name: Chaos Cluster Initialization Manually
+name: Chaos-Create
 
 on:
   workflow_dispatch:
