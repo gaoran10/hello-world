@@ -18,6 +18,7 @@ def main():
         print('istio external ip: ', istio_external_ip)
         pulsar_proxy_external_ip = subprocess.os.popen("kubectl get svc -n chaos-" + os.getenv('CLUSTER_ID') + " | grep proxy | awk '{print$4}'").read().strip()
         print('pulsar proxy external ip: ', pulsar_proxy_external_ip)
+        subprocess.os.popen("su root")
         for i in range(3):
             subprocess.os.popen("echo '" + istio_external_ip + " chaos-pulsar-" + os.getenv('CLUSTER_ID') + "-broker-" + str(i) + ".pulsar.kop.service' >> /etc/hosts")
         os.system('cat /etc/hosts')

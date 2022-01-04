@@ -36,6 +36,29 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
 
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: test link action
+        run: |
+          python ./hello/scripts/test-platform-hook.py test_start ${{ github.run_id }} ${{ github.event.inputs.testId }}
+
       - name: 'install kubectl and helm'
         run: |
           echo 'install kubectl'
@@ -66,25 +89,6 @@ jobs:
           echo "------------------- get-credentials -------------------"
           gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
 
-      - name: setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-
-      - uses: BSFishy/pip-action@v1
-        with:
-          packages: ruamel.yaml
-
-      - name: prepare python components
-        run:
-          pip install requests
-
-      - name: checkout hello-world repo
-        uses: actions/checkout@v2
-        with:
-          ref: master
-          path: hello
-
       - name: checkout chaos-test repo
         uses: actions/checkout@v2
         with:
@@ -107,22 +111,22 @@ jobs:
         run: |
           python ./hello/scripts/chaos-test-workflow-manually.py
 
-      - name: chaos test finish
-        env:
-          GITHUB_USERNAME: gaoran10
-          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
-          STATUS: ${{ job.status }}
-          TEST_ACTION: finish
-        if: ${{ always() ||  success() || cancelled() || failure() }}
+      - name: chaos test success
+        if: ${{ success() }}
         run: |
-          python ./hello/scripts/chaos-test-workflow-manually.py
+          python ./hello/scripts/test-platform-hook.py test_success ${{ github.run_id }} ${{ github.event.inputs.testId }}
+
+      - name: chaos test failed
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          python ./hello/scripts/test-platform-hook.py test_failed ${{ github.run_id }} ${{ github.event.inputs.testId }}
           pwd
           ls ./chaos-test/target
           zip -r -y ./artifacts.zip ./chaos-test/target/surefire-reports/
 
       - uses: actions/upload-artifact@master
         name: upload surefire-artifacts
-        if: ${{ always() ||  success() || cancelled() || failure() }}
+        if: ${{ always() || cancelled() || failure() }}
         with:
           name: surefire-artifacts
           path: artifacts.zip

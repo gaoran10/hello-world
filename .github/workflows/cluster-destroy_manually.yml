@@ -24,11 +24,28 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
 
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
       - name: checkout hello-world repo
         uses: actions/checkout@v2
         with:
           ref: master
           path: hello
+
+      - name: test link action
+        run: |
+          python ./hello/scripts/test-platform-hook.py cluster_stop ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
 
       - name: 'install kubectl and helm'
         run: |

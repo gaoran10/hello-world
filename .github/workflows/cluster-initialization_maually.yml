@@ -32,11 +32,28 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
 
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
       - name: checkout hello-world repo
         uses: actions/checkout@v2
         with:
           ref: master
           path: hello
+
+      - name: test link action
+        run: |
+          python ./hello/scripts/test-platform-hook.py cluster_start ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
 
       - name: 'install kubectl and helm'
         run: |
@@ -75,19 +92,6 @@ jobs:
           ref: gaoran/use-nio-netty-server-cnx-factory
           path: charts
 
-      - name: setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-
-      - uses: BSFishy/pip-action@v1
-        with:
-          packages: ruamel.yaml
-
-      - name: prepare python components
-        run:
-          pip install requests
-
       - name: deploy cluster
         env:
           GITHUB_USERNAME: gaoran10
@@ -108,13 +112,12 @@ jobs:
           kubectl create secret generic chaos-pulsar-${{ github.event.inputs.clusterID }}-tls-proxy -n 'chaos-${{ github.event.inputs.clusterID }}' --from-file=../hello/secure/kop/keystore.jks --from-file=../hello/secure/kop/truststore.jks
           helm install --set initialize=true --set namespace='chaos-${{ github.event.inputs.clusterID }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.inputs.clusterID }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
 
-      - name: deploy cluster finish
-        env:
-          GITHUB_USERNAME: gaoran10
-          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          STATUS: ${{ job.status }}
-          TEST_ACTION: finish
-        if: ${{ always() ||  success() || cancelled() || failure() }}
+      - name: deploy cluster success
+        if: ${{ success() }}
         run: |
-          python ./hello/scripts/chaos-cluster-manager-manually.py
+          python ./hello/scripts/test-platform-hook.py cluster_start_success ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
+
+      - name: deploy cluster failed
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          python ./hello/scripts/test-platform-hook.py cluster_start_failed ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
