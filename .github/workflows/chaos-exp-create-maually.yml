@@ -3,6 +3,9 @@ name: Chaos-Create
 on:
   workflow_dispatch:
     inputs:
+      clusterId:
+        description: 'Chaos exp clusterId'
+        required: true
       expId:
         description: 'Chaos exp ID'
         required: true
@@ -26,9 +29,10 @@ jobs:
     steps:
       - name: ExpId_${{ github.event.inputs.expId }}
         run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
           echo "expId: ${{ github.event.inputs.expId }}"
           echo "expType: ${{ github.event.inputs.expType }}"
-          echo "component: ${{ github.event.inputs.expId }}"
+          echo "component: ${{ github.event.inputs.component }}"
           echo "properties: ${{ github.event.inputs.properties }}"
 
       - name: Dump GitHub context
@@ -95,6 +99,10 @@ jobs:
           repository: gaoran10/charts
           ref: gaoran/use-nio-netty-server-cnx-factory
           path: charts
+
+      - name: deploy chaos exp
+        run: |
+          python ./hello/chaos-exp-manager-manually.py ${{ github.event.inputs.expType }} ${{ github.event.inputs.component }} ${{ github.event.inputs.properties }} ${{ github.event.inputs.clusterId }}
 
       - name: create chaos exp finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
