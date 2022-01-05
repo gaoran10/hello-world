@@ -6,6 +6,15 @@ on:
       expId:
         description: 'Chaos exp ID'
         required: true
+      expType:
+        description: 'Chaos exp type'
+        required: true
+      component:
+        description: 'Chaos exp component'
+        required: true
+      properties:
+        description: 'Chaos exp properties'
+        required: true
 
 jobs:
   chaos-pulsar-cluster:
@@ -18,6 +27,9 @@ jobs:
       - name: ExpId_${{ github.event.inputs.expId }}
         run: |
           echo "expId: ${{ github.event.inputs.expId }}"
+          echo "expType: ${{ github.event.inputs.expType }}"
+          echo "component: ${{ github.event.inputs.expId }}"
+          echo "properties: ${{ github.event.inputs.properties }}"
 
       - name: Dump GitHub context
         env:
@@ -87,4 +99,4 @@ jobs:
       - name: create chaos exp finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          python ./hello/scripts/test-platform-hook.py start_finish_chaos ${{ github.event.inputs.expId }}
+          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} ${{ github.event.inputs.expId }}
