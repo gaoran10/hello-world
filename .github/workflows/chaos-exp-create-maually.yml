@@ -3,21 +3,24 @@ name: Chaos-Create
 on:
   workflow_dispatch:
     inputs:
-      clusterId:
-        description: 'Chaos exp clusterId'
+      exps:
+        description: 'Chaos experiments'
         required: true
-      expId:
-        description: 'Chaos exp ID'
-        required: true
-      expType:
-        description: 'Chaos exp type'
-        required: true
-      component:
-        description: 'Chaos exp component'
-        required: true
-      properties:
-        description: 'Chaos exp properties'
-        required: true
+#      clusterId:
+#        description: 'Chaos exp clusterId'
+#        required: true
+#      expId:
+#        description: 'Chaos exp ID'
+#        required: true
+#      expType:
+#        description: 'Chaos exp type'
+#        required: true
+#      component:
+#        description: 'Chaos exp component'
+#        required: true
+#      properties:
+#        description: 'Chaos exp properties'
+#        required: true
 
 jobs:
   chaos-pulsar-cluster:
@@ -29,11 +32,13 @@ jobs:
     steps:
       - name: ExpId_${{ github.event.inputs.expId }}
         run: |
-          echo "clusterId: ${{ github.event.inputs.clusterId }}"
-          echo "expId: ${{ github.event.inputs.expId }}"
-          echo "expType: ${{ github.event.inputs.expType }}"
-          echo "component: ${{ github.event.inputs.component }}"
-          echo "properties: ${{ github.event.inputs.properties }}"
+          echo "exps: ${{ github.event.inputs.exps }}"
+
+#          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+#          echo "expId: ${{ github.event.inputs.expId }}"
+#          echo "expType: ${{ github.event.inputs.expType }}"
+#          echo "component: ${{ github.event.inputs.component }}"
+#          echo "properties: ${{ github.event.inputs.properties }}"
 
       - name: Dump GitHub context
         env:
@@ -61,7 +66,7 @@ jobs:
 
       - name: start hook
         run: |
-          python ./hello/scripts/test-platform-hook.py chaos_start ${{ github.run_id }} ${{ github.event.inputs.expId }}
+          python ./hello/scripts/test-platform-hook.py chaos_start ${{ github.run_id }} ${{ github.event.inputs.exps }}
 
       - name: 'install kubectl and helm'
         run: |
@@ -102,9 +107,10 @@ jobs:
 
       - name: deploy chaos exp
         run: |
-          python ./hello/scripts/chaos-exp-manager-manually.py ${{ github.event.inputs.expType }} ${{ github.event.inputs.component }} ${{ github.event.inputs.properties }} ${{ github.event.inputs.clusterId }}
+          python ./hello/scripts/chaos-exp-manager-manually.py ${{ github.event.inputs.exps }}
+#          python ./hello/scripts/chaos-exp-manager-manually.py ${{ github.event.inputs.expType }} ${{ github.event.inputs.component }} '${{ github.event.inputs.properties }}' ${{ github.event.inputs.clusterId }}
 
       - name: create chaos exp finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} ${{ github.event.inputs.expId }}
+          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} ${{ github.event.inputs.exps }}
