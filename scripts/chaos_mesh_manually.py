@@ -1,5 +1,8 @@
+import json
 import random
 import os
+import sys
+
 from ruamel.yaml import YAML
 
 # pip install ruamel.yaml
@@ -69,24 +72,35 @@ class ChaosMeshEditor:
         return random_str
 
 
-def deploy_exp(exp, base_path="../chaos-mesh-template"):
-    print('deploy exp: ', exp)
-    if not exp:
+def deploy_exp(base_path="../chaos-mesh-template"):
+    if sys.argv.__len__() != 2:
+        raise RuntimeError("Miss chaos exp params.")
+    exp_list_json = sys.argv[1]
+    if exp_list_json is None or exp_list_json == '':
+        raise RuntimeError("Miss exp list json string.")
+
+    print('deploy exp: ', exp_list_json)
+    exp_list = json.loads(exp_list_json);
+    if not exp_list:
         raise RuntimeError("No chaos-mesh experiments.")
 
-    if exp['expType'] == 'POD_KILL':
-        editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-kill-schedule-temp.yaml', True)
-        editor.add_label_selector(exp['component'])
-        if 'cron' in exp['properties']:
-            editor.set_schedule(exp['properties']['cron'])
-        else:
-            editor.set_schedule('*/5 * * * *')
-        editor.deploy()
-    elif exp['expType'] == 'NETWORK_DELAY':
-        editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-network-delay-schedule-temp.yaml', True)
-        editor.add_label_selector(exp['component'])
-        if 'cron' in exp:
-            editor.set_schedule(exp['properties']['cron'])
-        else:
-            editor.set_schedule('*/5 * * * *')
-        editor.deploy()
+    for exp in exp_list:
+        if exp['expType'] == 'POD_KILL':
+            editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-kill-schedule-temp.yaml', True)
+            editor.add_label_selector(exp['component'])
+            if 'cron' in exp['properties']:
+                editor.set_schedule(exp['properties']['cron'])
+            else:
+                editor.set_schedule('*/5 * * * *')
+            editor.deploy()
+        elif exp['expType'] == 'NETWORK_DELAY':
+            editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-network-delay-schedule-temp.yaml', True)
+            editor.add_label_selector(exp['component'])
+            if 'cron' in exp:
+                editor.set_schedule(exp['properties']['cron'])
+            else:
+                editor.set_schedule('*/5 * * * *')
+            editor.deploy()
+
+
+deploy_exp()

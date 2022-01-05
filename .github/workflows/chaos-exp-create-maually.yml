@@ -30,9 +30,9 @@ jobs:
       id-token: 'write'
     runs-on: ubuntu-latest
     steps:
-      - name: ExpId_${{ github.event.inputs.expId }}
+      - name: input context
         run: |
-          echo "exps: ${{ github.event.inputs.exps }}"
+          echo "exps: '${{ github.event.inputs.exps }}'"
 
 #          echo "clusterId: ${{ github.event.inputs.clusterId }}"
 #          echo "expId: ${{ github.event.inputs.expId }}"
@@ -66,7 +66,7 @@ jobs:
 
       - name: start hook
         run: |
-          python ./hello/scripts/test-platform-hook.py chaos_start ${{ github.run_id }} ${{ github.event.inputs.exps }}
+          python ./hello/scripts/test-platform-hook.py chaos_start ${{ github.run_id }} '${{ github.event.inputs.exps }}'
 
       - name: 'install kubectl and helm'
         run: |
@@ -107,10 +107,10 @@ jobs:
 
       - name: deploy chaos exp
         run: |
-          python ./hello/scripts/chaos-exp-manager-manually.py ${{ github.event.inputs.exps }}
+          python ./hello/scripts/chaos_mesh_manually.py '${{ github.event.inputs.exps }}'
 #          python ./hello/scripts/chaos-exp-manager-manually.py ${{ github.event.inputs.expType }} ${{ github.event.inputs.component }} '${{ github.event.inputs.properties }}' ${{ github.event.inputs.clusterId }}
 
       - name: create chaos exp finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} ${{ github.event.inputs.exps }}
+          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} '${{ github.event.inputs.exps }}'
