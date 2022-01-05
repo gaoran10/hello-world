@@ -79,25 +79,26 @@ def deploy_exp(base_path="../chaos-mesh-template"):
     if exp_list_json is None or exp_list_json == '':
         raise RuntimeError("Miss exp list json string.")
 
-    print('deploy exp: ', exp_list_json)
     exp_list = json.loads(exp_list_json);
+    print('deploy exp lists: ', exp_list)
     if not exp_list:
         raise RuntimeError("No chaos-mesh experiments.")
 
     for exp in exp_list:
-        if exp['expType'] == 'POD_KILL':
+        properties = json.loads(exp['properties'])
+        if exp['expType'] == 'PodKill':
             editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-kill-schedule-temp.yaml', True)
             editor.add_label_selector(exp['component'])
-            if 'cron' in exp['properties']:
-                editor.set_schedule(exp['properties']['cron'])
+            if 'cron' in properties:
+                editor.set_schedule(properties['cron'])
             else:
                 editor.set_schedule('*/5 * * * *')
             editor.deploy()
-        elif exp['expType'] == 'NETWORK_DELAY':
+        elif exp['expType'] == 'NetworkDelay':
             editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-network-delay-schedule-temp.yaml', True)
             editor.add_label_selector(exp['component'])
-            if 'cron' in exp:
-                editor.set_schedule(exp['properties']['cron'])
+            if 'cron' in properties:
+                editor.set_schedule(properties['cron'])
             else:
                 editor.set_schedule('*/5 * * * *')
             editor.deploy()
