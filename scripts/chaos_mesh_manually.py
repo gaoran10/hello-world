@@ -72,7 +72,7 @@ class ChaosMeshEditor:
         return random_str
 
 
-def deploy_exp(base_path="../chaos-mesh-template"):
+def deploy_exp(base_path="./chaos-mesh-template"):
     if sys.argv.__len__() != 2:
         raise RuntimeError("Miss chaos exp params.")
     exp_list_json = sys.argv[1]
