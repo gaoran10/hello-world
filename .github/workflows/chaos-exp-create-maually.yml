@@ -102,7 +102,7 @@ jobs:
 
       - name: deploy chaos exp
         run: |
-          python ./hello/chaos-exp-manager-manually.py ${{ github.event.inputs.expType }} ${{ github.event.inputs.component }} ${{ github.event.inputs.properties }} ${{ github.event.inputs.clusterId }}
+          python ./hello/scripts/chaos-exp-manager-manually.py ${{ github.event.inputs.expType }} ${{ github.event.inputs.component }} ${{ github.event.inputs.properties }} ${{ github.event.inputs.clusterId }}
 
       - name: create chaos exp finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
