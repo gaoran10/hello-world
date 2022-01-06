@@ -26,8 +26,10 @@ def main():
         # os.system('cat /etc/hosts')
 
         if os.getenv('TEST_NAME') == 'KoPTest':
+            print('start build kop test docker image')
             os.system('docker build -t kop-test -f chaos-test/kop-docker/KoPTestDockerfile .')
-            test_res = os.system('docker run -it -e istioIP=' + istio_external_ip + ' -e clusterId=' + os.getenv('CLUSTER_ID') + ' -e pulsarIP=' + pulsar_proxy_external_ip + ' kop-test')
+            print('run kop test docker image')
+            test_res = os.system('docker run -e istioIP=' + istio_external_ip + ' -e clusterId=' + os.getenv('CLUSTER_ID') + ' -e pulsarIP=' + pulsar_proxy_external_ip + ' kop-test')
             if test_res != 0:
                 raise RuntimeError("Chaos test for kop failed. code " + str(test_res) + ".")
         else:
