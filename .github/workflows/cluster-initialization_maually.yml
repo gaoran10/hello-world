@@ -118,6 +118,6 @@ jobs:
           python ./hello/scripts/test-platform-hook.py cluster_start_success ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
 
       - name: deploy cluster failed
-        if: ${{ always() || cancelled() || failure() }}
+        if: ${{ cancelled() || failure() }}
         run: |
           python ./hello/scripts/test-platform-hook.py cluster_start_failed ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
