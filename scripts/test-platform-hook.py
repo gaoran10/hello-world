@@ -6,7 +6,7 @@ import sys
 
 class TestPlatformApi:
 
-    _base_url = 'http://127.0.0.1:9091/test-platform/'
+    _base_url = 'http://35.226.0.60:9091/test-platform/'
 
     def cluster_start_action(self, cluster_id, action_id):
         url = self._base_url + 'clusters/' + cluster_id + '/start-action/' + action_id
@@ -69,27 +69,27 @@ def main():
 
     print('test platform hook - action_name: ', action_name, ', action_id: ', action_id, ', correlation_id: ', correlation_id)
 
-    # api = TestPlatformApi()
-    # if action_name == 'cluster_start':
-    #     api.cluster_start_action(correlation_id, action_id)
-    # elif action_name == 'cluster_start_success':
-    #     api.cluster_start_success(correlation_id)
-    # elif action_name == 'cluster_start_failed':
-    #     api.cluster_start_failed(correlation_id)
-    # elif action_name == 'cluster_stop':
-    #     api.cluster_stop_action(correlation_id, action_id)
-    # elif action_name == 'chaos_start':
-    #     api.chaos_exp_link_action(correlation_id, action_id)
-    # elif action_name == 'chaos_start_finish':
-    #     api.start_finish_chaos_hook(correlation_id)
-    # elif action_name == 'test_start':
-    #     api.test_link_action(correlation_id, action_id)
-    # elif action_name == 'test_success':
-    #     api.test_success(correlation_id)
-    # elif action_name == 'test_failed':
-    #     api.test_failed(correlation_id)
-    # else:
-    #     raise RuntimeError('Unsupported action ' + action_name)
+    api = TestPlatformApi()
+    if action_name == 'cluster_start':
+        api.cluster_start_action(correlation_id, action_id)
+    elif action_name == 'cluster_start_success':
+        api.cluster_start_success(correlation_id)
+    elif action_name == 'cluster_start_failed':
+        api.cluster_start_failed(correlation_id)
+    elif action_name == 'cluster_stop':
+        api.cluster_stop_action(correlation_id, action_id)
+    elif action_name == 'chaos_start':
+        api.chaos_exp_link_action(correlation_id, action_id)
+    elif action_name == 'chaos_start_finish':
+        api.start_finish_chaos_hook(correlation_id)
+    elif action_name == 'test_start':
+        api.test_link_action(correlation_id, action_id)
+    elif action_name == 'test_success':
+        api.test_success(correlation_id)
+    elif action_name == 'test_failed':
+        api.test_failed(correlation_id)
+    else:
+        raise RuntimeError('Unsupported action ' + action_name)
 
 
 main()
