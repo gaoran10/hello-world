@@ -111,8 +111,8 @@ jobs:
         run: |
           python ./hello/scripts/chaos-test-workflow-manually.py
 
-      - name: Setup Debug Session
-        uses: csexton/debugger-action@master
+#      - name: Setup Debug Session
+#        uses: csexton/debugger-action@master
 
       - name: chaos test success
         if: ${{ success() }}
