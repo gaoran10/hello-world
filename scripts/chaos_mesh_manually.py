@@ -8,6 +8,12 @@ from ruamel.yaml import YAML
 # pip install ruamel.yaml
 
 
+def format_exp_type(exp_type):
+    type_char_list = list(exp_type)
+    type_char_list[0] = type_char_list[0].lower()
+    return ''.join(type_char_list)
+
+
 class ChaosMeshEditor:
 
     base_ns_name = 'chaos-'
@@ -47,7 +53,7 @@ class ChaosMeshEditor:
     def add_label_selector(self, component):
         if self._is_scheduled:
             exp_type = self._exp['spec']['type']
-            exp_type = self.format_exp_type(exp_type)
+            exp_type = format_exp_type(exp_type)
             self._exp['spec'][exp_type]['selector']['namespaces'] = [self._ns]
             self._exp['spec'][exp_type]['selector']['labelSelectors']['component'] = component
         else:
@@ -58,11 +64,6 @@ class ChaosMeshEditor:
         if not self._is_scheduled:
             raise RuntimeError("Setting schedule only support scheduled experiments.")
         self._exp['spec']['schedule'] = corn
-
-    def format_exp_type(self, exp_type):
-        type_char_list = list(exp_type)
-        type_char_list[0] = type_char_list[0].lower()
-        return ''.join(type_char_list)
 
     def random_name(self, count):
         str = 'abcdefghijklmnopqrstuvwxyz0123456789'
@@ -79,7 +80,7 @@ def deploy_exp(base_path="./hello/chaos-mesh-template"):
     if exp_list_json is None or exp_list_json == '':
         raise RuntimeError("Miss exp list json string.")
 
-    exp_list = json.loads(exp_list_json);
+    exp_list = json.loads(exp_list_json)
     print('deploy exp lists: ', exp_list)
     if not exp_list:
         raise RuntimeError("No chaos-mesh experiments.")
@@ -87,21 +88,19 @@ def deploy_exp(base_path="./hello/chaos-mesh-template"):
     for exp in exp_list:
         properties = json.loads(exp['properties'])
         if exp['expType'] == 'PodKill':
-            editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-kill-schedule-temp.yaml', True)
-            editor.add_label_selector(exp['component'])
-            if 'cron' in properties:
-                editor.set_schedule(properties['cron'])
-            else:
-                editor.set_schedule('*/5 * * * *')
-            editor.deploy()
+            template_file = base_path + '/pod-kill-schedule-temp.yaml'
         elif exp['expType'] == 'NetworkDelay':
-            editor = ChaosMeshEditor(exp['clusterId'], base_path + '/pod-network-delay-schedule-temp.yaml', True)
-            editor.add_label_selector(exp['component'])
-            if 'cron' in properties:
-                editor.set_schedule(properties['cron'])
-            else:
-                editor.set_schedule('*/5 * * * *')
-            editor.deploy()
+            template_file = base_path + '/pod-network-delay-schedule-temp.yaml'
+        else:
+            raise RuntimeError("Unsupported chaos mesh experiment type.")
+
+        editor = ChaosMeshEditor(exp['clusterId'], template_file, True)
+        editor.add_label_selector(exp['component'])
+        if 'corn' in properties:
+            editor.set_schedule(properties['corn'])
+        else:
+            editor.set_schedule('*/5 * * * *')
+        editor.deploy()
 
 
 deploy_exp()

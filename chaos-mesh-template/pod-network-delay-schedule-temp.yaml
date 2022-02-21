@@ -12,10 +12,10 @@ spec:
     action: delay
     mode: one
     selector:
-      namespaces:
-        - chaos-ns
       labelSelectors:
-        'component': 'broker'
+        component: selector-component
+      namespaces:
+        - selector-ns
     delay:
       latency: '30ms'
       correlation: '100'
