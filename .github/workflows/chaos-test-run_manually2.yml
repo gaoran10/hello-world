@@ -1,0 +1,125 @@
+name: Chaos Test Maually
+
+on:
+  workflow_dispatch:
+    inputs:
+      clusterId:
+        description: 'The cluster id'
+        required: true
+      testId:
+        description: 'The test id'
+        required: true
+      testName:
+        description: 'The test method name'
+        required: false
+      duration:
+        description: 'Test duration'
+        required: false
+      testCommand:
+        description: 'Test command'
+        required: true
+
+jobs:
+  chaos-test:
+    name: RunTest_${{ github.event.inputs.testId }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: TestId_${{ github.event.inputs.testId }}
+        run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "testId: ${{ github.event.inputs.testId }}"
+          echo "testName: ${{ github.event.inputs.testName }}"
+          echo "duration: ${{ github.event.inputs.duration }}"
+          echo "testCommand: ${{ github.event.inputs.testCommand }}"
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
+      - name: checkout hello-world repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: hello
+
+      - name: test link action
+        run: |
+          echo "test link action ${{ github.run_id }} ${{ github.event.inputs.testId }}"
+
+      - name: 'install kubectl and helm'
+        run: |
+          echo 'install kubectl'
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.1/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          echo 'install helm'
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - uses: 'google-github-actions/setup-gcloud@master'
+        with:
+          project_id: 'affable-ray-226821'
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          workload_identity_provider: 'projects/72250869071/locations/global/workloadIdentityPools/chaos-test-identity-pool/providers/github-action'
+          service_account: 'sn-chaos-test@affable-ray-226821.iam.gserviceaccount.com'
+
+      # Authenticate using the created credentials file.
+      #
+      # WARNING: The --cred-file flag is in preview and is subject to change.
+      - name: 'gcloud login'
+        run: |
+          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+          gcloud config set compute/zone us-east4-b
+          echo "------------------- get-credentials -------------------"
+          gcloud container clusters get-credentials chaos-tests --region us-central1 --project affable-ray-226821
+
+      - name: checkout chaos-test repo
+        uses: actions/checkout@v2
+        with:
+          repository: streamnative/chaos-test
+          token: ${{ secrets.RAN_GITHUB_TOKEN }}
+          ref: master
+          path: chaos-test
+
+      - name: chaos test create
+        env:
+          GITHUB_USERNAME: gaoran10
+          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+          TEST_ACTION: create
+          CLUSTER_ID: ${{ github.event.inputs.clusterId }}
+          TEST_NAME: ${{ github.event.inputs.testName }}
+          TEST_DURATION: ${{ github.event.inputs.duration }}
+          TEST_COMMAND: ${{ github.event.inputs.testCommand }}
+        run: |
+          python ./hello/scripts/chaos-test-workflow-manually2.py
+
+      - name: chaos test success
+        if: ${{ success() }}
+        run: |
+          echo "chaos test success ${{ github.run_id }} ${{ github.event.inputs.testId }}"
+
+      - name: chaos test failed
+        if: ${{ cancelled() || failure() }}
+        run: |
+          echo "chaos test failed ${{ github.run_id }} ${{ github.event.inputs.testId }}"
+
