@@ -6,7 +6,8 @@ import sys
 
 class TestPlatformApi:
 
-    _base_url = 'http://35.226.0.60:9091/test-platform/'
+#     _base_url = 'http://35.226.0.60:9091/test-platform/'
+    _base_url = 'http://37fa-112-240-53-229.ngrok.io/test-platform/'
 
     def cluster_start_action(self, cluster_id, action_id):
         url = self._base_url + 'clusters/' + cluster_id + '/start-action/' + action_id
