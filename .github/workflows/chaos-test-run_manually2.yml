@@ -1,4 +1,4 @@
-name: Chaos Test Maually
+name: Chaos Test Maually2
 
 on:
   workflow_dispatch:
@@ -62,6 +62,7 @@ jobs:
       - name: test link action
         run: |
           echo "test link action ${{ github.run_id }} ${{ github.event.inputs.testId }}"
+          python ./hello/scripts/test-platform-hook.py test_start ${{ github.run_id }} ${{ github.event.inputs.testId }}
 
       - name: 'install kubectl and helm'
         run: |
@@ -117,9 +118,10 @@ jobs:
         if: ${{ success() }}
         run: |
           echo "chaos test success ${{ github.run_id }} ${{ github.event.inputs.testId }}"
+          python ./hello/scripts/test-platform-hook.py test_success ${{ github.run_id }} ${{ github.event.inputs.testId }}
 
       - name: chaos test failed
         if: ${{ cancelled() || failure() }}
         run: |
           echo "chaos test failed ${{ github.run_id }} ${{ github.event.inputs.testId }}"
-
+          python ./hello/scripts/test-platform-hook.py test_failed ${{ github.run_id }} ${{ github.event.inputs.testId }}
