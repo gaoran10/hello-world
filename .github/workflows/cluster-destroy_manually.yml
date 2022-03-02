@@ -6,6 +6,9 @@ on:
       clusterId:
         description: 'Cluster ID in test platform'
         required: true
+      serverHookUrl:
+        description: 'The test platform server url'
+        required: true
 
 jobs:
   chaos-pulsar-cluster:
@@ -18,6 +21,7 @@ jobs:
       - name: ClusterId_${{ github.event.inputs.clusterId }}
         run: |
           echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "serverHookUrl: ${{ github.event.inputs.serverHookUrl }}"
 
       - name: Dump GitHub context
         env:
@@ -45,7 +49,7 @@ jobs:
 
       - name: test link action
         run: |
-          python ./hello/scripts/test-platform-hook.py cluster_stop ${{ github.run_id }} ${{ github.event.inputs.clusterId }}
+          python ./hello/scripts/test-platform-hook.py cluster_stop ${{ github.run_id }} ${{ github.event.inputs.clusterId }} '${{ github.event.inputs.serverHookUrl }}'
 
       - name: 'install kubectl and helm'
         run: |

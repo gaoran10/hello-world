@@ -6,6 +6,10 @@ on:
       exps:
         description: 'Chaos experiments'
         required: true
+      serverHookUrl:
+        description: 'The test platform server url'
+        required: true
+
 #      clusterId:
 #        description: 'Chaos exp clusterId'
 #        required: true
@@ -33,6 +37,7 @@ jobs:
       - name: input context
         run: |
           echo "exps: '${{ github.event.inputs.exps }}'"
+          echo "serverHookUrl: '${{ github.event.inputs.serverHookUrl }}'"
 
 #          echo "clusterId: ${{ github.event.inputs.clusterId }}"
 #          echo "expId: ${{ github.event.inputs.expId }}"
@@ -66,7 +71,7 @@ jobs:
 
       - name: start hook
         run: |
-          python ./hello/scripts/test-platform-hook.py chaos_start ${{ github.run_id }} '${{ github.event.inputs.exps }}'
+          python ./hello/scripts/test-platform-hook.py chaos_start ${{ github.run_id }} '${{ github.event.inputs.exps }}' '${{ github.event.inputs.serverHookUrl }}'
 
       - name: 'install kubectl and helm'
         run: |
@@ -113,4 +118,4 @@ jobs:
       - name: create chaos exp finish
         if: ${{ always() ||  success() || cancelled() || failure() }}
         run: |
-          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} '${{ github.event.inputs.exps }}'
+          python ./hello/scripts/test-platform-hook.py chaos_start_finish ${{ github.run_id }} '${{ github.event.inputs.exps }}' '${{ github.event.inputs.serverHookUrl }}'

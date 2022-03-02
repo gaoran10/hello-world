@@ -15,6 +15,9 @@ on:
       duration:
         description: 'Test duration'
         required: true
+      serverHookUrl:
+        description: 'The test platform server url'
+        required: true
 
 jobs:
   chaos-test:
@@ -30,6 +33,7 @@ jobs:
           echo "testId: ${{ github.event.inputs.testId }}"
           echo "testName: ${{ github.event.inputs.testName }}"
           echo "duration: ${{ github.event.inputs.duration }}"
+          echo "serverHookUrl: ${{ github.event.inputs.serverHookUrl }}"
 
       - name: Dump GitHub context
         env:
@@ -57,7 +61,7 @@ jobs:
 
       - name: test link action
         run: |
-          python ./hello/scripts/test-platform-hook.py test_start ${{ github.run_id }} ${{ github.event.inputs.testId }}
+          python ./hello/scripts/test-platform-hook.py test_start ${{ github.run_id }} ${{ github.event.inputs.testId }} '${{ github.event.inputs.serverHookUrl }}'
 
       - name: 'install kubectl and helm'
         run: |
@@ -117,12 +121,12 @@ jobs:
       - name: chaos test success
         if: ${{ success() }}
         run: |
-          python ./hello/scripts/test-platform-hook.py test_success ${{ github.run_id }} ${{ github.event.inputs.testId }}
+          python ./hello/scripts/test-platform-hook.py test_success ${{ github.run_id }} ${{ github.event.inputs.testId }} '${{ github.event.inputs.serverHookUrl }}'
 
       - name: chaos test failed
         if: ${{ cancelled() || failure() }}
         run: |
-          python ./hello/scripts/test-platform-hook.py test_failed ${{ github.run_id }} ${{ github.event.inputs.testId }}
+          python ./hello/scripts/test-platform-hook.py test_failed ${{ github.run_id }} ${{ github.event.inputs.testId }} '${{ github.event.inputs.serverHookUrl }}'
           pwd
           ls ./chaos-test/target
           zip -r -y ./artifacts.zip ./chaos-test/target/surefire-reports/

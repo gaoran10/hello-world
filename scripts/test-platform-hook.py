@@ -6,8 +6,10 @@ import sys
 
 class TestPlatformApi:
 
-#     _base_url = 'http://35.226.0.60:9091/test-platform/'
-    _base_url = 'http://a42d-103-149-181-39.ngrok.io/test-platform/'
+    _base_url = ''
+
+    def __init__(self, server_url):
+        self._base_url = server_url + '/test-platform/'
 
     def cluster_start_action(self, cluster_id, action_id):
         url = self._base_url + 'clusters/' + cluster_id + '/start-action/' + action_id
@@ -56,7 +58,7 @@ class TestPlatformApi:
 
 
 def main():
-    if sys.argv.__len__() != 4:
+    if sys.argv.__len__() != 5:
         raise RuntimeError("Miss hook params.")
     action_name = sys.argv[1]
     if action_name is None or action_name == '':
@@ -67,10 +69,13 @@ def main():
     correlation_id = sys.argv[3]
     if id is None or correlation_id == '':
         raise RuntimeError("Miss correlation id.")
+    server_url = sys.argv[4]
+    if server_url is None or server_url == '':
+        raise RuntimeError("Miss server url")
 
-    print('test platform hook - action_name: ', action_name, ', action_id: ', action_id, ', correlation_id: ', correlation_id)
+    print('test platform hook - server_url: ' + server_url + ', action_name: ', action_name, ', action_id: ', action_id, ', correlation_id: ', correlation_id)
 
-    api = TestPlatformApi()
+    api = TestPlatformApi(server_url)
     if action_name == 'cluster_start':
         api.cluster_start_action(correlation_id, action_id)
     elif action_name == 'cluster_start_success':
