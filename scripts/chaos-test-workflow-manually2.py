@@ -6,6 +6,7 @@ import subprocess
 
 def main():
     test_action = os.getenv('TEST_ACTION')
+    server_hook_url = os.getenv('SERVER_HOOK_URL')
 
     if test_action == 'create':
         print('chaos test create ...')
@@ -28,6 +29,7 @@ def main():
             command += " -Dpulsar.external.service.domain=" + pulsar_proxy_external_ip
             command += " -Dchaos.test.duration=" + str(os.getenv('TEST_DURATION'))
             command += " -Dchaos.test.istio.external.ip=" + istio_external_ip
+            command += " -Dchaos.test-platform.server="  + server_hook_url
             print('run test command: ', command)
             test_res = os.system(command)
             if test_res != 0:
