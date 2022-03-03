@@ -115,6 +115,7 @@ jobs:
           TEST_NAME: ${{ github.event.inputs.testName }}
           TEST_DURATION: ${{ github.event.inputs.duration }}
           TEST_COMMAND: ${{ github.event.inputs.testCommand }}
+          TEST_ID: ${{ github.event.inputs.testId }}
           SERVER_HOOK_URL: ${{ github.event.inputs.serverHookUrl }}
         run: |
           python ./hello/scripts/chaos-test-workflow-manually2.py
