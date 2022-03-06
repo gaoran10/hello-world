@@ -29,7 +29,7 @@ def main():
             os.system('docker build -t kop-test -f chaos-test/kop-docker/KoPTestDockerfile .')
             print('run kop test based on docker image')
 
-            test_command += "-Dchaos.test.istio.external.ip=chaos-pulsar-" + os.getenv('CLUSTER_ID') + "-broker-0.pulsar.kop.service"
+            test_command += " -Dchaos.test.istio.external.ip=chaos-pulsar-" + os.getenv('CLUSTER_ID') + "-broker-0.pulsar.kop.service"
             command = "docker run"
             command += " -e ISTIO_IP=" + istio_external_ip
             command += " -e CLUSTER_ID=" + os.getenv('CLUSTER_ID')
