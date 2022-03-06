@@ -34,7 +34,7 @@ def main():
             command += " -e ISTIO_IP=" + istio_external_ip
             command += " -e CLUSTER_ID=" + os.getenv('CLUSTER_ID')
             command += " -e PULSAR_IP=" + pulsar_proxy_external_ip
-            command += " -e TEST_COMMAND=" + test_command
+            command += " -e TEST_COMMAND='" + test_command + "'"
             command += " kop-test"
             print('run kop test command: ', command)
             test_res = os.system(command)
