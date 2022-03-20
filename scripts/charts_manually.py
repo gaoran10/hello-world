@@ -39,7 +39,7 @@ class ValuesEditor:
 
     def __init__(self, input_file_path):
         self._values = self.load_file(input_file_path)
-        self._output_file_path = input_file_path
+        self._output_file_path = input_file_path + '-u'
 
     @staticmethod
     def load_file(input_file_path):
@@ -106,7 +106,10 @@ def deploy_exp():
 
     broker_env = check_and_get_configuration(cluster_configuration, 'brokerEnv')
     for env in broker_env:
-        values['broker']['configData'][env] = broker_env[env]
+        values['broker']['extraEnv'].append({
+            'name': env,
+            'value': broker_env[env]
+        })
 
     if check_image_user(image_name, image_version):
         print('USER 10000 exist')
@@ -117,9 +120,9 @@ def deploy_exp():
         }
     else:
         values['zookeeper']['securityContext'] = {}
-
     print(values['zookeeper']['securityContext'])
-    # values_editors.check_values()
+
+    values_editors.check_values()
     values_editors.write()
 
 
