@@ -1,4 +1,5 @@
 import json
+import requests
 import sys
 
 from ruamel.yaml import YAML
@@ -23,12 +24,22 @@ def check_and_get_configuration(configuration, configuration_name):
     return configuration[configuration_name]
 
 
+def check_image_user(image_name, image_version):
+    url = 'https://hub.docker.com/v2/repositories/' + image_name + '/tags/' + image_version + '/images'
+    r = requests.get(url)
+    for layer in r.json()[0]['layers']:
+        if str(layer['instruction']).__contains__('USER 10000'):
+            print('contain USER 10000')
+            return True
+    return False
+
+
 class ValuesEditor:
     base_ns_name = 'chaos-'
 
     def __init__(self, input_file_path):
         self._values = self.load_file(input_file_path)
-        self._output_file_path = input_file_path + "-update"
+        self._output_file_path = input_file_path
 
     @staticmethod
     def load_file(input_file_path):
@@ -97,7 +108,18 @@ def deploy_exp():
     for env in broker_env:
         values['broker']['configData'][env] = broker_env[env]
 
-    values_editors.check_values()
+    if check_image_user(image_name, image_version):
+        print('USER 10000 exist')
+        values['zookeeper']['securityContext'] = {
+            'runAsUser': 10000,
+            'runAsGroup': 0,
+            'fsGroup': 0
+        }
+    else:
+        values['zookeeper']['securityContext'] = {}
+
+    print(values['zookeeper']['securityContext'])
+    # values_editors.check_values()
     values_editors.write()
 
 
