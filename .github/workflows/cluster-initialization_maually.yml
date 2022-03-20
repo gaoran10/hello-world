@@ -114,7 +114,7 @@ jobs:
         run: |
           rm -rf ./charts/charts/pulsar-custom
           cp -r ./charts/charts/pulsar-2.8.0.8 charts/pulsar-custom
-          ./hello/hello/scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
+          ./hello/scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
           python ./hello/scripts/chaos-cluster-manager-manually.py
           cd charts
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
