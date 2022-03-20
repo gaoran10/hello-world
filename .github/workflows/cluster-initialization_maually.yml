@@ -107,8 +107,8 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           TEST_ACTION: create
           CLUSTER_ID: ${{ github.event.inputs.clusterId }}
-#          IMAGE_NAME: ${{ github.event.inputs.imageName }}
-#          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
+          IMAGE_NAME: ${{ github.event.inputs.imageName }}
+          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
           rm -rf ./charts/charts/pulsar-custom
           cp -r ./charts/charts/pulsar-2.8.0.8 charts/pulsar-custom
