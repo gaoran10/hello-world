@@ -100,6 +100,8 @@ jobs:
           ref: gaoran/use-nio-netty-server-cnx-factory
           path: charts
 
+#          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
+
       - name: deploy cluster
         env:
           GITHUB_USERNAME: gaoran10
@@ -115,7 +117,6 @@ jobs:
           ./hello/hello/scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
           python ./hello/scripts/chaos-cluster-manager-manually.py
           cd charts
-#          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
