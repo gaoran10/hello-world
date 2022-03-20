@@ -39,7 +39,7 @@ class ValuesEditor:
 
     def __init__(self, input_file_path):
         self._values = self.load_file(input_file_path)
-        self._output_file_path = input_file_path + '-u'
+        self._output_file_path = input_file_path
 
     @staticmethod
     def load_file(input_file_path):
