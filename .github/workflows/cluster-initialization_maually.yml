@@ -15,6 +15,9 @@ on:
       serverHookUrl:
         description: 'The test platform server url'
         required: true
+      clusterConfiguration:
+        description: 'The cluster configuration json'
+        required: true
 
 jobs:
   chaos-pulsar-cluster:
@@ -30,6 +33,7 @@ jobs:
           echo "imageName: ${{ github.event.inputs.imageName }}"
           echo "imageVersion: ${{ github.event.inputs.imageVersion }}"
           echo "serverHookUrl: ${{ github.event.inputs.serverHookUrl }}"
+          echo "clusterConfiguration: ${{ github.event.inputs.clusterConfiguration }}"
 
       - name: Dump GitHub context
         env:
@@ -103,12 +107,15 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           TEST_ACTION: create
           CLUSTER_ID: ${{ github.event.inputs.clusterId }}
-          IMAGE_NAME: ${{ github.event.inputs.imageName }}
-          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
+#          IMAGE_NAME: ${{ github.event.inputs.imageName }}
+#          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
+          rm -rf ./charts/charts/pulsar-custom
+          cp -r ./charts/charts/pulsar-2.8.0.8 charts/pulsar-custom
+          ./hello/hello/scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
           python ./hello/scripts/chaos-cluster-manager-manually.py
           cd charts
-          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
+#          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
           ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
           helm repo add loki https://grafana.github.io/loki/charts
           helm dependency update charts/pulsar-custom
