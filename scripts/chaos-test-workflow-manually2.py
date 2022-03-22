@@ -16,10 +16,13 @@ def main():
         print('istio external ip: ', istio_external_ip)
         pulsar_proxy_external_ip = subprocess.os.popen("kubectl get svc -n chaos-" + os.getenv('CLUSTER_ID') + " | grep proxy | awk '{print$4}'").read().strip()
         print('pulsar proxy external ip: ', pulsar_proxy_external_ip)
+        pulsar_broker_ingerss_external_ip = subprocess.os.popen("kubectl get svc -n chaos-" + os.getenv('CLUSTER_ID') + " | grep broker-ingress | awk '{print$4}'").read().strip()
+        print('pulsar broker external ip: ', pulsar_broker_ingerss_external_ip)
 
         test_command = os.getenv('TEST_COMMAND')
         test_command += " -Dpulsar.deployment.type=EXTERNAL"
-        test_command += " -Dpulsar.external.service.domain=" + pulsar_proxy_external_ip
+        test_command += " -Dpulsar.proxy.external.service.domain=" + pulsar_proxy_external_ip
+        test_command += " -Dpulsar.broker-ingerss.external.service.domain=" + pulsar_broker_ingerss_external_ip
         test_command += " -Dchaos.test.duration=" + str(os.getenv('TEST_DURATION'))
         test_command += " -Dchaos.test.id=" + test_id
         test_command += " -Dchaos.test-platform.server=" + server_hook_url
