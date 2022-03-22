@@ -20,6 +20,8 @@ def check_and_get_configuration(configuration, configuration_name):
             return False
         if configuration_name == 'brokerEnv':
             return []
+        if configuration_name == 'proxyEnv':
+            return []
         raise RuntimeError("Miss cluster configuration " + str(configuration_name))
     return configuration[configuration_name]
 
@@ -103,12 +105,20 @@ def deploy_exp():
             values['images'][image]['repository'] = image_name
 
     values['components']['kop'] = check_and_get_configuration(cluster_configuration, 'enableKoP')
+    values['components']['mop'] = check_and_get_configuration(cluster_configuration, 'enableMoP')
 
     broker_env = check_and_get_configuration(cluster_configuration, 'brokerEnv')
     for env in broker_env:
         values['broker']['extraEnv'].append({
             'name': env,
             'value': broker_env[env]
+        })
+
+    proxy_env = check_and_get_configuration(cluster_configuration, 'proxyEnv')
+    for env in proxy_env:
+        values['proxy']['extraEnv'].append({
+            'name': env,
+            'value': proxy_env[env]
         })
 
     if check_image_user(image_name, image_version):
