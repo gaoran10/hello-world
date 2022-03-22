@@ -118,7 +118,8 @@ jobs:
           TEST_ID: ${{ github.event.inputs.testId }}
           SERVER_HOOK_URL: ${{ github.event.inputs.serverHookUrl }}
         run: |
-          python ./hello/scripts/chaos-test-workflow-manually2.py
+          cd chars-test
+          python ../hello/scripts/chaos-test-workflow-manually2.py
 
       - name: chaos test success
         if: ${{ success() }}
