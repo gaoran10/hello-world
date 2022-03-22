@@ -60,7 +60,7 @@ jobs:
           echo 'install helm'
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-      - uses: 'google-github-actions/setup-gcloud@master'
+      - uses: 'google-github-actions/setup-gcloud@v0'
         with:
           project_id: 'affable-ray-226821'
 
