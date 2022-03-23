@@ -101,7 +101,7 @@ def deploy_exp():
     for image in values['images']:
         if image in image_version_list:
             values['images'][image]['tag'] = image_version
-        if image in image_list:
+        if image in image_version_list:
             values['images'][image]['repository'] = image_name
 
     values['components']['kop'] = check_and_get_configuration(cluster_configuration, 'enableKoP')
