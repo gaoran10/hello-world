@@ -1,0 +1,123 @@
+name: Chaos Cluster Initialization Azure
+
+on:
+  workflow_dispatch:
+    inputs:
+      clusterId:
+        description: 'Cluster ID in test platform'
+        required: true
+      imageName:
+        description: 'The Pulsar image name'
+        required: true
+      imageVersion:
+        description: 'The Pulsar image version'
+        required: true
+      serverHookUrl:
+        description: 'The test platform server url'
+        required: true
+      clusterConfiguration:
+        description: 'The cluster configuration json'
+        required: true
+
+jobs:
+  chaos-pulsar-cluster:
+    name: PrepareCluster_${{ github.event.inputs.clusterId }}
+    environment: test
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          path: chaos-test
+
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - run: |
+          az account set --subscription 56634e24-acf2-40a9-9b49-41fd31aded1c
+          az aks get-credentials --resource-group chaos-test --name chaos-test
+
+      - name: ClusterId_${{ github.event.inputs.clusterId }}
+        run: |
+          echo "clusterId: ${{ github.event.inputs.clusterId }}"
+          echo "imageName: ${{ github.event.inputs.imageName }}"
+          echo "imageVersion: ${{ github.event.inputs.imageVersion }}"
+          echo "serverHookUrl: ${{ github.event.inputs.serverHookUrl }}"
+          echo "clusterConfiguration: ${{ github.event.inputs.clusterConfiguration }}"
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: ruamel.yaml
+
+      - name: prepare python components
+        run:
+          pip install requests
+
+#      - name: test link action
+#        run: |
+#          python ./scripts/test-platform-hook.py cluster_start ${{ github.run_id }} ${{ github.event.inputs.clusterId }} '${{ github.event.inputs.serverHookUrl }}'
+
+      - name: 'install kubectl and helm'
+        run: |
+          echo 'install kubectl'
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.1/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          echo 'install helm'
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          kubectl get pods -A
+
+#      - name: checkout chars repo
+#        uses: actions/checkout@v2
+#        with:
+#          repository: gaoran10/charts
+#          ref: gaoran/use-nio-netty-server-cnx-factory
+#          path: charts
+#
+#      - name: deploy cluster
+#        env:
+#          GITHUB_USERNAME: gaoran10
+#          GITHUB_TOKEN: ${{ secrets.RAN_GITHUB_TOKEN }}
+#          RUN_ID: ${{ github.run_id }}
+#          TEST_ACTION: create
+#          CLUSTER_ID: ${{ github.event.inputs.clusterId }}
+#          IMAGE_NAME: ${{ github.event.inputs.imageName }}
+#          IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
+#        run: |
+#          rm -rf ./charts/charts/pulsar-custom
+#          cp -r ./charts/charts/pulsar-2.8.0.8 ./charts/charts/pulsar-custom
+#          python ./scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
+#          python ./scripts/chaos-cluster-manager-manually.py
+#          cd charts
+#          ./scripts/pulsar/prepare_helm_release.sh -n 'chaos-${{ github.event.inputs.clusterID }}' -k 'chaos-pulsar-${{ github.event.inputs.clusterID }}' -c
+#          helm repo add loki https://grafana.github.io/loki/charts
+#          helm dependency update charts/pulsar-custom
+#          kubectl label namespace 'chaos-${{ github.event.inputs.clusterID }}' istio-injection=enabled
+#          kubectl create secret generic chaos-pulsar-${{ github.event.inputs.clusterID }}-tls-proxy -n 'chaos-${{ github.event.inputs.clusterID }}' --from-file=../secure/kop/keystore.jks --from-file=../secure/kop/truststore.jks
+#          helm install --set initialize=true --set namespace='chaos-${{ github.event.inputs.clusterID }}' --values ./charts/pulsar-custom/values.yaml 'chaos-pulsar-${{ github.event.inputs.clusterID }}'  ./charts/pulsar-custom/ --debug --wait --timeout 30m
+#
+#      - name: deploy cluster success
+#        if: ${{ success() }}
+#        run: |
+#          python ./scripts/test-platform-hook.py cluster_start_success ${{ github.run_id }} ${{ github.event.inputs.clusterId }} '${{ github.event.inputs.serverHookUrl }}'
+#
+#      - name: deploy cluster failed
+#        if: ${{ cancelled() || failure() }}
+#        run: |
+#          python ./scripts/test-platform-hook.py cluster_start_failed ${{ github.run_id }} ${{ github.event.inputs.clusterId }} '${{ github.event.inputs.serverHookUrl }}'
