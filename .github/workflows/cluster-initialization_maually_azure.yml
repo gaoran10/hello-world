@@ -5,19 +5,19 @@ on:
     inputs:
       clusterId:
         description: 'Cluster ID in test platform'
-        required: true
+        required: false
       imageName:
         description: 'The Pulsar image name'
-        required: true
+        required: false
       imageVersion:
         description: 'The Pulsar image version'
-        required: true
+        required: false
       serverHookUrl:
         description: 'The test platform server url'
-        required: true
+        required: false
       clusterConfiguration:
         description: 'The cluster configuration json'
-        required: true
+        required: false
 
 jobs:
   chaos-pulsar-cluster:
