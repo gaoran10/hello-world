@@ -19,19 +19,16 @@ on:
         description: 'The cluster configuration json'
         required: false
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   chaos-pulsar-cluster:
     name: PrepareCluster_${{ github.event.inputs.clusterId }}
     environment: test
-    permissions:
-      contents: 'read'
-      id-token: 'write'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-        with:
-          path: chaos-test
-
       - name: 'Az CLI login'
         uses: azure/login@v1
         with:
@@ -39,9 +36,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: 'Run az commands'
+        run: |
+          az account show
+          az group list
+
       - run: |
           az account set --subscription 56634e24-acf2-40a9-9b49-41fd31aded1c
           az aks get-credentials --resource-group chaos-test --name chaos-test
+
+      - uses: actions/checkout@v1
+        with:
+          path: chaos-test
 
       - name: ClusterId_${{ github.event.inputs.clusterId }}
         run: |
