@@ -26,7 +26,7 @@ permissions:
 jobs:
   chaos-pulsar-cluster:
     name: PrepareCluster_${{ github.event.inputs.clusterId }}
-    environment: test
+    environment: chaos-test-env
     runs-on: ubuntu-latest
     steps:
       - name: 'Az CLI login'
