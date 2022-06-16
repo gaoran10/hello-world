@@ -97,7 +97,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: gaoran10/charts
-          ref: gaoran/use-nio-netty-server-cnx-factory
+          ref: gaoran/chaos-test
           path: charts
 
 #          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
@@ -113,7 +113,7 @@ jobs:
           IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
           rm -rf ./charts/charts/pulsar-custom
-          cp -r ./charts/charts/pulsar-2.8.0.8 ./charts/charts/pulsar-custom
+          cp -r ./charts/charts/pulsa ./charts/charts/pulsar-custom
           python ./hello/scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
           python ./hello/scripts/chaos-cluster-manager-manually.py
           cd charts
