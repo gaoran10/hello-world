@@ -113,7 +113,7 @@ jobs:
           IMAGE_VERSION: ${{ github.event.inputs.imageVersion }}
         run: |
           rm -rf ./charts/charts/pulsar-custom
-          cp -r ./charts/charts/pulsa ./charts/charts/pulsar-custom
+          cp -r ./charts/charts/pulsar ./charts/charts/pulsar-custom
           python ./hello/scripts/charts_manually.py ./charts/charts/pulsar-custom/values.yaml '${{ github.event.inputs.clusterConfiguration }}'
           python ./hello/scripts/chaos-cluster-manager-manually.py
           cd charts
