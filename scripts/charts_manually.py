@@ -123,17 +123,17 @@ def deploy_exp():
             'value': proxy_env[env]
         })
 
-    if str(image_version).startswith('2.10'):
-        values['zookeeper']['securityContext'] = {
-            'runAsUser': 10000,
-            'runAsGroup': 0,
-            'fsGroup': 0
-        }
-        values['bookkeeper']['securityContext'] = {
-            'runAsUser': 10000,
-            'runAsGroup': 0,
-            'fsGroup': 0
-        }
+    # if str(image_version).startswith('2.10'):
+    #     values['zookeeper']['securityContext'] = {
+    #         'runAsUser': 10000,
+    #         'runAsGroup': 0,
+    #         'fsGroup': 0
+    #     }
+    #     values['bookkeeper']['securityContext'] = {
+    #         'runAsUser': 10000,
+    #         'runAsGroup': 0,
+    #         'fsGroup': 0
+    #     }
 
     # if check_image_user(image_name, image_version):
     #     print('USER 10000 exist')
