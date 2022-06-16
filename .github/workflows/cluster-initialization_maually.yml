@@ -97,7 +97,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: gaoran10/charts
-          ref: gaoran/chaos-test
+          ref: chaos-test
           path: charts
 
 #          ./scripts/pulsar/change_pulsar_image.sh ${{ github.event.inputs.imageName }} ${{ github.event.inputs.imageVersion }}
