@@ -1,4 +1,4 @@
-name: Chaos Test Maually2
+name: Chaos Test Run
 
 on:
   workflow_dispatch:
@@ -21,6 +21,9 @@ on:
       serverHookUrl:
         description: 'The test platform server url'
         required: true
+      imageVersion:
+        description: 'The Pulsar version'
+        required: false
 
 jobs:
   chaos-test:
@@ -117,6 +120,9 @@ jobs:
           TEST_COMMAND: ${{ github.event.inputs.testCommand }}
           TEST_ID: ${{ github.event.inputs.testId }}
           SERVER_HOOK_URL: ${{ github.event.inputs.serverHookUrl }}
+          PULSAR_VERSION: ${{ github.event.inputs.imageVersion }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+          CLOUDSMITH_DEPENDENCY_TOKEN: ${{ secrets.CLOUDSMITH_DEPENDENCY_TOKEN }}
         run: |
           python ./hello/scripts/chaos-test-workflow-manually2.py
 

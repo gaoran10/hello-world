@@ -6,7 +6,7 @@ from pom_utils import PomModifier
 
 
 def update_pom():
-    pom_modifier = PomModifier('./pom.xml')
+    pom_modifier = PomModifier('./chaos-test/pom.xml')
     pulsar_version = os.getenv('PULSAR_VERSION')
     if pulsar_version is not None and pulsar_version != '':
         pom_modifier.update_property('pulsar.version', pulsar_version)
@@ -59,7 +59,7 @@ def main():
             if test_res != 0:
                 raise RuntimeError("Chaos test for kop failed. code " + str(test_res) + ".")
         else:
-            command = test_command
+            command = "cd chaos-test && " + test_command
             print('run test command: ', command)
             test_res = os.system(command)
             if test_res != 0:
