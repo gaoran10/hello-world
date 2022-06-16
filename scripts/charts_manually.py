@@ -101,7 +101,9 @@ def deploy_exp():
     for image in values['images']:
         if image in image_version_list:
             values['images'][image]['tag'] = image_version
-        if image in image_version_list:
+        if str(image_name).startswith('docker.cloudsmith.io') and image in image_version_list:
+            values['images'][image]['repository'] = image_name
+        elif image in image_list:
             values['images'][image]['repository'] = image_name
 
     values['components']['kop'] = check_and_get_configuration(cluster_configuration, 'enableKoP')
@@ -121,16 +123,31 @@ def deploy_exp():
             'value': proxy_env[env]
         })
 
-    if check_image_user(image_name, image_version):
-        print('USER 10000 exist')
+    if str(image_version).startswith('2.10'):
         values['zookeeper']['securityContext'] = {
             'runAsUser': 10000,
             'runAsGroup': 0,
             'fsGroup': 0
         }
-    else:
-        values['zookeeper']['securityContext'] = {}
-    print(values['zookeeper']['securityContext'])
+        values['bookkeeper']['securityContext'] = {
+            'runAsUser': 10000,
+            'runAsGroup': 0,
+            'fsGroup': 0
+        }
+
+    # if check_image_user(image_name, image_version):
+    #     print('USER 10000 exist')
+    #     values['zookeeper']['securityContext'] = {
+    #         'runAsUser': 10000,
+    #         'runAsGroup': 0,
+    #         'fsGroup': 0
+    #     }
+    # else:
+    #     values['zookeeper']['securityContext'] = {}
+    # print(values['zookeeper']['securityContext'])
+
+    if str(image_name).startswith('docker.cloudsmith.io'):
+        values['imagePullSecrets'] = 'cloudsmith'
 
     values_editors.check_values()
     values_editors.write()
